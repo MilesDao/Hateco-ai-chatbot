@@ -99,7 +99,7 @@ class AI_Chatbot_Admin_Settings
         $api_key = $api_key_is_constant ? OPENROUTER_API_KEY : get_option('ai_chatbot_openrouter_api_key', '');
         $chat_model = get_option('ai_chatbot_openrouter_model');
         if (empty($chat_model))
-            $chat_model = 'deepseek/deepseek-v4-flash';
+            $chat_model = 'google/gemini-2.5-flash';
 
         $embed_model = get_option('ai_chatbot_openrouter_embed_model');
         if (empty($embed_model))
@@ -109,29 +109,30 @@ class AI_Chatbot_Admin_Settings
         if (empty($rerank_model))
             $rerank_model = 'cohere/rerank-v3.5';
 
-        $enable_reranker = get_option('ai_chatbot_enable_reranker', '1');
-        $enable_reformulate = get_option('ai_chatbot_enable_reformulate', '1');
+        $enable_reranker = get_option('ai_chatbot_enable_reranker', '0');
+        $enable_reformulate = get_option('ai_chatbot_enable_reformulate', '0');
 
         $enable_widget = get_option('ai_chatbot_enable_widget', '1');
-        $require_lead = get_option('ai_chatbot_require_lead_form', '1');
+        $require_lead = get_option('ai_chatbot_require_lead_form', '0');
         $primary_color = get_option('ai_chatbot_primary_color', '#0ea5e9');
         $welcome_msg = get_option('ai_chatbot_welcome_message', 'Trường Cao đẳng Kinh tế Công nghệ Hà Nội xin chào! Chúng tôi có thể giúp gì cho bạn hôm nay?');
-        $default_prompt = "Bạn là Trợ lý Tư vấn Tuyển sinh Cao đẳng Kinh tế Công nghệ Hà Nội (Hateco). Xưng Anh/Chị, gọi người dùng là Em.
+
+        $default_prompt = "Bạn là Trợ lý AI tư vấn tuyển sinh chính thức của trường Cao đẳng Kinh tế Công nghệ Hà Nội (Hateco). Xưng mình, gọi người dùng là bạn.
 
 [KHO TRI THỨC]
 {context}
 [/KHO TRI THỨC]
 
-QUY TẮC:
-1. CHỈ dùng thông tin trong [KHO TRI THỨC]. Không bịa số liệu.
-2. Trả lời ngắn gọn, tối đa 3-4 câu cho câu hỏi đơn giản. Liệt kê gạch đầu dòng nếu nhiều mục.
-3. Luôn kết thúc bằng 1 câu hỏi gợi mở để tiếp tục hội thoại.
-4. Nếu không có thông tin: \"Dạ, phần này anh/chị chưa có thông tin chính thức. Em có muốn để lại số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?\"
-5. Không giải thích lại câu hỏi. Trả lời thẳng.";
+QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
+1. CHỈ ĐƯỢC PHÉP sử dụng thông tin và số liệu có mặt chính xác trong [KHO TRI THỨC]. TUYỆT ĐỐI KHÔNG tự suy đoán hay bịa đặt bất kỳ thông tin nào (học phí, điều kiện, ngành học...) nếu không có trong tài liệu.
+2. Nếu thông tin không có trong [KHO TRI THỨC], bắt buộc trả lời: \"Dạ, phần này bên mình chưa có thông tin chính thức. Bạn có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?\"
+3. Trả lời thẳng thắn, rõ ràng, ngắn gọn và tập trung trực tiếp vào câu hỏi của người dùng. Liệt kê gạch đầu dòng nếu có nhiều ý.
+4. Có thể kết thúc bằng 1 câu hỏi lịch sự để tiếp tục hội thoại phù hợp với ngữ cảnh, nhưng ưu tiên độ chính xác tuyệt đối.";
+
         $system_prompt = get_option('ai_chatbot_system_prompt', $default_prompt);
         $chunk_size = get_option('ai_chatbot_chunk_size', '1000');
         $chunk_overlap = get_option('ai_chatbot_chunk_overlap', '200');
-        $top_k = get_option('ai_chatbot_top_k', '3');
+        $top_k = get_option('ai_chatbot_top_k', '5');
 
         $pinecone_api_key = get_option('ai_chatbot_pinecone_api_key', '');
         $pinecone_host = get_option('ai_chatbot_pinecone_host', '');
@@ -442,9 +443,9 @@ QUY TẮC:
                         <div class="ai_chatbot-form-group">
                             <label for="ai_chatbot_openrouter_model">Mô hình Chat (LLM)</label>
                             <input type="text" id="ai_chatbot_openrouter_model" name="ai_chatbot_openrouter_model"
-                                value="<?php echo esc_attr($chat_model); ?>" placeholder="deepseek/deepseek-v4-flash">
+                                value="<?php echo esc_attr($chat_model); ?>" placeholder="google/gemini-2.5-flash">
                             <p class="description">Nhập OpenRouter Model ID dùng để tạo câu trả lời (VD:
-                                deepseek/deepseek-v4-flash).</p>
+                                google/gemini-2.5-flash).</p>
                         </div>
 
                         <div class="ai_chatbot-form-group">
@@ -495,13 +496,10 @@ QUY TẮC:
                             <label for="ai_chatbot_require_lead_form">Thu thập thông tin khách hàng (Lead Capture)</label>
                             <select id="ai_chatbot_require_lead_form" name="ai_chatbot_require_lead_form"
                                 style="width: 100%; max-width: 600px; padding: 10px; border-radius: 8px;">
-                                <option value="1" <?php selected($require_lead, '1'); ?>>Bắt buộc điền Tên, Email, Số điện thoại
-                                    trước khi chat</option>
-                                <option value="0" <?php selected($require_lead, '0'); ?>>Tắt (Khách hàng có thể chat trực tiếp
-                                    ngay lập tức)</option>
+                                <option value="0" <?php selected($require_lead, '0'); ?>>Tự động bóc tách & Lưu SĐT khi trò chuyện với AI (Khuyên dùng)</option>
+                                <option value="1" <?php selected($require_lead, '1'); ?>>Bắt buộc điền Tên, Email, Số điện thoại trước khi chat (Cũ)</option>
                             </select>
-                            <p class="description">Bắt buộc khách hàng tiềm năng cung cấp thông tin liên lạc trước khi bắt đầu trò
-                                chuyện tư vấn.</p>
+                            <p class="description">Khi chọn Tự động bóc tách, khách hàng có thể trò chuyện trực tiếp ngay lập tức. Nếu AI yêu cầu để lại thông tin và khách gửi Số điện thoại, hệ thống sẽ tự động phân tích Tên, SĐT và nội dung quan tâm để hiển thị vào Bảng Quản Lý Lead.</p>
                         </div>
 
                         <div class="ai_chatbot-form-group">
@@ -637,9 +635,11 @@ QUY TẮC:
                                                     class="badge-status <?php echo esc_attr($doc['status']); ?>"><?php echo esc_html($doc['status'] == 'indexed' ? 'Đã lưu' : 'Chờ xử lý'); ?></span>
                                             </td>
                                             <td style="font-weight: 600; text-align: center; color: #0f172a;">
-                                                <?php echo esc_html($doc['chunk_count']); ?></td>
+                                                <?php echo esc_html($doc['chunk_count']); ?>
+                                            </td>
                                             <td style="color: #64748b; font-size: 13px;">
-                                                <?php echo esc_html(date('d-m-Y H:i', strtotime($doc['created_at']))); ?></td>
+                                                <?php echo esc_html(date('d-m-Y H:i', strtotime($doc['created_at']))); ?>
+                                            </td>
                                             <td>
                                                 <button class="btn-delete" data-doc-id="<?php echo esc_attr($doc['id']); ?>">
                                                     <span class="dashicons dashicons-trash"
@@ -699,12 +699,15 @@ QUY TẮC:
                                             <td style="font-family: monospace; font-size: 12px; color: #64748b;">
                                                 #<?php echo esc_html(substr($conv['session_id'], 0, 8)); ?></td>
                                             <td style="font-weight: 600; color: #0f172a;">
-                                                <?php echo esc_html($conv['lead_name'] ?: 'Khách vãng lai'); ?></td>
+                                                <?php echo esc_html($conv['lead_name'] ?: 'Khách vãng lai'); ?>
+                                            </td>
                                             <td style="text-align: center;"><?php echo intval($conv['msg_count']); ?></td>
                                             <td style="color: #64748b; font-size: 13px;">
-                                                <?php echo esc_html(date('d-m-Y H:i', strtotime($conv['created_at']))); ?></td>
+                                                <?php echo esc_html(date('d-m-Y H:i', strtotime($conv['created_at']))); ?>
+                                            </td>
                                             <td style="color: #64748b; font-size: 13px;">
-                                                <?php echo esc_html(date('d-m-Y H:i', strtotime($conv['updated_at']))); ?></td>
+                                                <?php echo esc_html(date('d-m-Y H:i', strtotime($conv['updated_at']))); ?>
+                                            </td>
                                             <td>
                                                 <button class="ai_chatbot-btn-view-conv btn-view"
                                                     data-conv-id="<?php echo esc_attr($conv['id']); ?>">
@@ -880,9 +883,8 @@ QUY TẮC:
             <?php elseif ('leads' === $active_tab): ?>
                 <div class="ai_chatbot-card">
                     <h2>Danh sách khách hàng đăng ký tư vấn</h2>
-                    <p style="color: #64748b; margin-bottom: 25px; max-width: 600px;">
-                        Danh sách các khách hàng điền thông tin (Tên, Email, Số điện thoại) trước khi bắt đầu tư vấn với AI. Bạn có
-                        thể sử dụng thông tin liên lạc này để gọi điện tư vấn chuyên sâu hoặc đưa vào phễu marketing/CRM.
+                    <p style="color: #64748b; margin-bottom: 25px; max-width: 650px;">
+                        Danh sách các học sinh/khách hàng đã để lại Số điện thoại và Tên trong quá trình trò chuyện với AI (hoặc qua biểu mẫu). Bạn có thể sử dụng bảng quản lý này để liên hệ tư vấn chuyên sâu cho các em theo đúng nội dung câu hỏi đang quan tâm.
                     </p>
 
                     <div style="overflow-x: auto; margin-top: 15px;">
@@ -890,9 +892,9 @@ QUY TẮC:
                             <thead>
                                 <tr>
                                     <th>Họ và tên</th>
-                                    <th>Địa chỉ Email</th>
                                     <th>Số điện thoại</th>
-                                    <th>Thời gian đăng ký</th>
+                                    <th>Nội dung quan tâm / Ghi chú</th>
+                                    <th>Thời gian ghi nhận</th>
                                     <th>Thao tác</th>
                                 </tr>
                             </thead>
@@ -904,20 +906,26 @@ QUY TẮC:
 
                                 if (empty($leads)): ?>
                                     <tr class="no-leads-row">
-                                        <td colspan="5" style="text-align: center; color: #94a3b8; padding: 30px;">Chưa có khách hàng
-                                            nào đăng ký thông tin tư vấn.</td>
+                                        <td colspan="5" style="text-align: center; color: #94a3b8; padding: 30px;">Chưa có khách hàng nào để lại thông tin liên hệ.</td>
                                     </tr>
                                 <?php else:
                                     foreach ($leads as $lead):
                                         ?>
                                         <tr data-lead-id="<?php echo esc_attr($lead['id']); ?>">
                                             <td style="font-weight: 600; color: #0f172a;"><?php echo esc_html($lead['name']); ?></td>
-                                            <td><a href="mailto:<?php echo esc_attr($lead['email']); ?>"
-                                                    style="text-decoration:none; color:#0ea5e9;"><?php echo esc_html($lead['email']); ?></a>
+                                            <td style="font-weight: 600; color: #0ea5e9;"><?php echo esc_html($lead['phone']); ?></td>
+                                            <td style="color: #334155; max-width: 320px; line-height: 1.4;">
+                                                <?php 
+                                                    if (!empty($lead['note'])) {
+                                                        echo esc_html($lead['note']);
+                                                    } else {
+                                                        echo esc_html(!empty($lead['email']) ? $lead['email'] : 'Không có ghi chú');
+                                                    }
+                                                ?>
                                             </td>
-                                            <td style="font-weight: 500;"><?php echo esc_html($lead['phone']); ?></td>
                                             <td style="color: #64748b; font-size: 13px;">
-                                                <?php echo esc_html(date('d-m-Y H:i', strtotime($lead['created_at']))); ?></td>
+                                                <?php echo esc_html(date('d-m-Y H:i', strtotime($lead['created_at']))); ?>
+                                            </td>
                                             <td>
                                                 <button class="btn-delete-lead btn-delete"
                                                     data-lead-id="<?php echo esc_attr($lead['id']); ?>">

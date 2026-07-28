@@ -176,7 +176,7 @@ class OpenRouter_API_Client {
         $body = array(
             'model' => $this->chat_model,
             'messages' => $messages,
-            'temperature' => 0.3,
+            'temperature' => 0.1,
             'max_tokens' => 500
         );
 
@@ -246,7 +246,7 @@ class OpenRouter_API_Client {
             'model'       => $this->chat_model,
             'messages'    => $messages,
             'stream'      => true,
-            'temperature' => 0.3,
+            'temperature' => 0.1,
             'max_tokens'  => 500
         );
 

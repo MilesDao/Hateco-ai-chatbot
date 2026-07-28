@@ -72,34 +72,6 @@ $widget_id = $is_inline ? 'ai_chatbot-chat-inline' : 'ai_chatbot-chat-floating';
             <?php endif; ?>
         </div>
 
-        <!-- Lead Capture Form Overlay -->
-        <div class="ai_chatbot-lead-form-overlay" id="<?php echo esc_attr($widget_id); ?>-lead-overlay"
-            style="display: none;">
-            <div class="ai_chatbot-lead-form-content">
-                <h3>Đăng ký Tư vấn</h3>
-                <p>Chào mừng bạn đến với Trường Cao đẳng Kinh tế Công nghệ Hà Nội Nơi chắp cánh tri thức – kiến tạo
-                    tương lai nghề nghiệp vững chắc.</p>
-                <form class="ai_chatbot-lead-form" id="<?php echo esc_attr($widget_id); ?>-lead-capture-form">
-                    <div class="ai_chatbot-lead-group">
-                        <input type="text" id="<?php echo esc_attr($widget_id); ?>-lead-name" required
-                            placeholder="Họ và tên *">
-                    </div>
-                    <div class="ai_chatbot-lead-group">
-                        <input type="email" id="<?php echo esc_attr($widget_id); ?>-lead-email" required
-                            placeholder="Địa chỉ Email *">
-                    </div>
-                    <div class="ai_chatbot-lead-group">
-                        <input type="tel" id="<?php echo esc_attr($widget_id); ?>-lead-phone" required
-                            placeholder="Số điện thoại *">
-                    </div>
-                    <div class="ai_chatbot-lead-error" id="<?php echo esc_attr($widget_id); ?>-lead-error"
-                        style="display:none; color:#ef4444; font-size:12px; margin-bottom:12px; font-weight:500;"></div>
-                    <button type="submit" class="ai_chatbot-btn-lead-submit"
-                        id="<?php echo esc_attr($widget_id); ?>-lead-submit">Bắt đầu tư vấn</button>
-                </form>
-            </div>
-        </div>
-
         <!-- Main Content Area: AI View -->
         <div class="ai_chatbot-view ai_chatbot-view-ai" id="<?php echo esc_attr($widget_id); ?>-view-ai">
             <!-- Chat Conversation Area -->
@@ -113,13 +85,12 @@ $widget_id = $is_inline ? 'ai_chatbot-chat-inline' : 'ai_chatbot-chat-floating';
             </div>
 
             <!-- Chat Input Area -->
-            <div class="ai_chatbot-chat-input-area ai_chatbot-hidden"
-                id="<?php echo esc_attr($widget_id); ?>-input-area" style="display: none;">
+            <div class="ai_chatbot-chat-input-area" id="<?php echo esc_attr($widget_id); ?>-input-area">
                 <form class="ai_chatbot-chat-form" id="<?php echo esc_attr($widget_id); ?>-form" autocomplete="off">
                     <input type="text" class="ai_chatbot-input-field" id="<?php echo esc_attr($widget_id); ?>-input"
-                        placeholder="Type your message" aria-label="Type message" disabled>
+                        placeholder="Nhập câu hỏi tư vấn tuyển sinh..." aria-label="Type message">
                     <button type="submit" class="ai_chatbot-btn-send" id="<?php echo esc_attr($widget_id); ?>-submit"
-                        aria-label="Send message" disabled>
+                        aria-label="Send message">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                             stroke-linecap="round" stroke-linejoin="round">
                             <line x1="22" y1="2" x2="11" y2="13"></line>

@@ -58,7 +58,7 @@ class AI_Chatbot_Manager
         // 3. Generate embeddings and save to database
         $chat_model = get_option('ai_chatbot_openrouter_model');
         if (empty($chat_model)) {
-            $chat_model = 'deepseek/deepseek-v4-flash';
+            $chat_model = 'google/gemini-2.5-flash';
         }
         $embed_model = get_option('ai_chatbot_openrouter_embed_model');
         if (empty($embed_model)) {
@@ -386,7 +386,7 @@ class AI_Chatbot_Manager
      * @param int $k Number of chunks to return.
      * @return array Array of associative arrays containing chunks: [ 'content', 'document_name', 'similarity' ]
      */
-    public function search_similar_chunks($query, $k = 3, $threshold = 0.3)
+    public function search_similar_chunks($query, $k = 5, $threshold = 0.25)
     {
         global $wpdb;
 
@@ -428,7 +428,7 @@ class AI_Chatbot_Manager
         $dense_scores_map = array(); // preserve original dense scores
         $chat_model = get_option('ai_chatbot_openrouter_model');
         if (empty($chat_model))
-            $chat_model = 'deepseek/deepseek-v4-flash';
+            $chat_model = 'google/gemini-2.5-flash';
         $embed_model = get_option('ai_chatbot_openrouter_embed_model');
         if (empty($embed_model))
             $embed_model = 'qwen/qwen3-embedding-8b';
@@ -533,7 +533,7 @@ class AI_Chatbot_Manager
         }
 
         // 4. CROSS-ENCODER RERANKING via OpenRouter
-        $enable_reranker = get_option('ai_chatbot_enable_reranker', '1');
+        $enable_reranker = get_option('ai_chatbot_enable_reranker', '0');
         $reranked_indices = array();
 
         if ('1' === $enable_reranker) {
@@ -590,7 +590,7 @@ class AI_Chatbot_Manager
                 break;
 
             // Skip low-relevance chunks when reranker is off (noise filter)
-            $enable_reranker_check = get_option('ai_chatbot_enable_reranker', '1');
+            $enable_reranker_check = get_option('ai_chatbot_enable_reranker', '0');
             if ('1' !== $enable_reranker_check && $r['score'] < $threshold)
                 continue;
 

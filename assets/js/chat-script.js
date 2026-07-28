@@ -137,30 +137,20 @@ jQuery(document).ready(function ($) {
             });
         }
 
-        try {
-            if (typeof aiChatbotVars !== 'undefined' && aiChatbotVars.require_lead !== undefined) {
-                requireLeadForm = aiChatbotVars.require_lead === '1';
-            }
-        } catch (e) { }
+        // Automatically enable chat interaction without upfront lead forms
+        if (leadOverlay.length) {
+            leadOverlay.hide();
+        }
+        inputArea.removeClass('ai_chatbot-hidden').show();
+        inputField.prop('disabled', false);
+        submitBtn.prop('disabled', false);
 
-        if (requireLeadForm && !hasLeadSubmitted) {
-            leadOverlay.removeClass('ai_chatbot-hidden').show();
-            inputArea.addClass('ai_chatbot-hidden').hide();
-            inputField.prop('disabled', true);
-            submitBtn.prop('disabled', true);
-        } else {
-            leadOverlay.addClass('ai_chatbot-hidden').hide();
-            inputArea.removeClass('ai_chatbot-hidden').show();
-            inputField.prop('disabled', false);
-            submitBtn.prop('disabled', false);
-
-            if (leadName) {
-                var nameParts = leadName.trim().split(/\s+/);
-                var firstName = nameParts.length > 0 ? nameParts[nameParts.length - 1] : '';
-                if (firstName) {
-                    var welcomeGreeting = 'Trường Cao đẳng Kinh tế Công nghệ Hà Nội xin chào ' + firstName + '! Chúng tôi có thể giúp gì cho bạn hôm nay?';
-                    messagesViewport.find('.ai_chatbot-msg-wrapper.bot:first .ai_chatbot-msg-bubble p').text(welcomeGreeting);
-                }
+        if (leadName) {
+            var nameParts = leadName.trim().split(/\s+/);
+            var firstName = nameParts.length > 0 ? nameParts[nameParts.length - 1] : '';
+            if (firstName) {
+                var welcomeGreeting = 'Trường Cao đẳng Kinh tế Công nghệ Hà Nội xin chào ' + firstName + '! Chúng tôi có thể giúp gì cho bạn hôm nay?';
+                messagesViewport.find('.ai_chatbot-msg-wrapper.bot:first .ai_chatbot-msg-bubble p').text(welcomeGreeting);
             }
         }
 
@@ -168,94 +158,6 @@ jQuery(document).ready(function ($) {
         if (sessionId) {
             setTimeout(function () { loadHistory(); }, 100);
         }
-
-        // Lead Form Submit
-        leadForm.on('submit', function (e) {
-            e.preventDefault();
-
-            var nameValue = $('#' + id + '-lead-name').val().trim();
-            var emailValue = $('#' + id + '-lead-email').val().trim();
-            var phoneValue = $('#' + id + '-lead-phone').val().trim();
-
-            if (!nameValue || !emailValue || !phoneValue) {
-                leadError.text('Vui lòng nhập đầy đủ thông tin bắt buộc.').show();
-                return;
-            }
-
-            leadSubmit.prop('disabled', true).text('Đang xử lý...');
-            leadError.hide();
-
-            var ajaxUrl = (typeof aiChatbotVars !== 'undefined' && aiChatbotVars.ajax_url) ? aiChatbotVars.ajax_url : '/wp-admin/admin-ajax.php';
-            var nonceValue = (typeof aiChatbotVars !== 'undefined' && aiChatbotVars.nonce) ? aiChatbotVars.nonce : '';
-
-            try {
-                $.ajax({
-                    url: ajaxUrl,
-                    type: 'POST',
-                    data: {
-                        action: 'ai_chatbot_submit_lead',
-                        nonce: nonceValue,
-                        name: nameValue,
-                        email: emailValue,
-                        phone: phoneValue
-                    },
-                    success: function (response) {
-                        if (typeof response === 'string') {
-                            try { response = JSON.parse(response); } catch (e) { }
-                        }
-
-                        if (response && response.success) {
-                            try {
-                                localStorage.setItem('ai_chatbot_lead_submitted', 'true');
-                                if (nameValue) {
-                                    localStorage.setItem('ai_chatbot_lead_name', nameValue);
-                                    leadName = nameValue;
-                                }
-                            } catch (e) { }
-
-                            var firstName = 'bạn';
-                            if (nameValue) {
-                                var nameParts = nameValue.trim().split(/\s+/);
-                                if (nameParts.length > 0) {
-                                    firstName = nameParts[nameParts.length - 1];
-                                }
-                            }
-
-                            var welcomeGreeting = 'Trường Cao đẳng Kinh tế Công nghệ Hà Nội xin chào ' + firstName + '! Chúng tôi có thể giúp gì cho bạn hôm nay?';
-                            messagesViewport.find('.ai_chatbot-msg-wrapper.bot:first .ai_chatbot-msg-bubble p').text(welcomeGreeting);
-
-                            setTimeout(function () {
-                                saveMessage('bot', welcomeGreeting, 'ai');
-                                // Only increment local history count if we append directly, but we let polling/reload handle it later
-                            }, 200);
-
-                            leadOverlay.addClass('ai_chatbot-hidden');
-                            setTimeout(function () {
-                                leadOverlay.hide();
-                                inputArea.removeClass('ai_chatbot-hidden').hide().fadeIn(400, function () {
-                                    inputField.prop('disabled', false).focus();
-                                    submitBtn.prop('disabled', false);
-                                });
-                            }, 400);
-                        } else {
-                            var errMsg = 'Đăng ký thất bại. Vui lòng kiểm tra lại.';
-                            if (response && response.data && response.data.message) {
-                                errMsg = response.data.message;
-                            }
-                            leadError.text(errMsg).show();
-                            leadSubmit.prop('disabled', false).text('Bắt đầu tư vấn');
-                        }
-                    },
-                    error: function () {
-                        leadError.text('Có lỗi kết nối hệ thống. Vui lòng thử lại.').show();
-                        leadSubmit.prop('disabled', false).text('Bắt đầu tư vấn');
-                    }
-                });
-            } catch (err) {
-                leadError.text('Đã xảy ra lỗi ngoài ý muốn. Vui lòng tải lại trang.').show();
-                leadSubmit.prop('disabled', false).text('Bắt đầu tư vấn');
-            }
-        });
 
         if (!isInline) {
             bubble.on('click', function (e) {
@@ -287,6 +189,14 @@ jQuery(document).ready(function ($) {
             bubble.find('.icon-close').show();
             bubble.find('.ai_chatbot-pulse-dot').fadeOut(300);
 
+            // Ensure input field and send button are explicitly enabled and interactive whenever chat opens
+            inputArea.removeClass('ai_chatbot-hidden').show();
+            inputField.prop('disabled', false).prop('readonly', false).css('pointer-events', 'auto');
+            submitBtn.prop('disabled', false);
+
+            setTimeout(function () {
+                inputField.focus();
+            }, 100);
             setTimeout(function () {
                 inputField.focus();
             }, 300);
