@@ -1,20 +1,20 @@
 /**
- * Frontend Controller for AI Chatbot
+ * Frontend Controller for Hateco AI Chatbot
  * Manages multiple chatbot instances, AJAX requests, scrolling, and markdown parsing.
  */
 
-jQuery(document).ready(function($) {
-    
+jQuery(document).ready(function ($) {
+
     // Initialize every chatbot instance on the page
-    $('.ai_chatbot-chatbot-container').each(function() {
+    $('.ai_chatbot-chatbot-container').each(function () {
         var container = $(this);
         var id = container.attr('id');
         var isInline = container.hasClass('ai_chatbot-layout-inline');
-        
+
         var bubble = $('#' + id + '-trigger');
         var chatWindow = $('#' + id + '-window');
         var minimizeBtn = $('#' + id + '-minimize');
-        
+
         // AI elements
         var messagesViewport = $('#' + id + '-messages');
         var chatForm = $('#' + id + '-form');
@@ -26,12 +26,12 @@ jQuery(document).ready(function($) {
         var leadForm = $('#' + id + '-lead-capture-form');
         var leadSubmit = $('#' + id + '-lead-submit');
         var leadError = $('#' + id + '-lead-error');
-        
+
         // Initial setup for Lead Capture Form
         var hasLeadSubmitted = false;
         var leadName = '';
         var requireLeadForm = true;
-        
+
         // Session / Conversation persistence
         var sessionId = '';
         try {
@@ -42,8 +42,8 @@ jQuery(document).ready(function($) {
             }
             hasLeadSubmitted = localStorage.getItem('ai_chatbot_lead_submitted') === 'true';
             leadName = localStorage.getItem('ai_chatbot_lead_name') || '';
-        } catch(e) {
-            console.warn("AI Chatbot: localStorage is blocked or unsupported in this browser environment.", e);
+        } catch (e) {
+            console.warn("Hateco AI Chatbot: localStorage is blocked or unsupported in this browser environment.", e);
             sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2, 10);
         }
 
@@ -72,8 +72,8 @@ jQuery(document).ready(function($) {
                     },
                     async: true
                 });
-            } catch(e) {
-                console.warn("AI Chatbot: Failed to persist message.", e);
+            } catch (e) {
+                console.warn("Hateco AI Chatbot: Failed to persist message.", e);
             }
         }
 
@@ -90,24 +90,24 @@ jQuery(document).ready(function($) {
                     nonce: nonceValue,
                     session_id: sessionId
                 },
-                success: function(response) {
+                success: function (response) {
                     if (typeof response === 'string') {
-                        try { response = JSON.parse(response); } catch(e) {}
+                        try { response = JSON.parse(response); } catch (e) { }
                     }
                     if (response && response.success && response.data && response.data.messages) {
                         var msgs = response.data.messages;
-                        
+
                         if (msgs.length > loadedHistoryCount) {
                             if (loadedHistoryCount === 0 && msgs.length > 0) {
                                 // Remove AI welcome placeholder on first load
                                 messagesViewport.find('.ai_chatbot-msg-wrapper.bot:first').remove();
                             }
-                            
+
                             var newMsgs = msgs.slice(loadedHistoryCount);
-                            $.each(newMsgs, function(i, msg) {
+                            $.each(newMsgs, function (i, msg) {
                                 var sender = msg.role === 'user' ? 'user' : 'bot';
                                 var msgMode = msg.chat_type === 'human' ? 'human' : 'ai';
-                                
+
                                 var msgTime = '';
                                 if (msg.created_at) {
                                     var parts = msg.created_at.split(' ');
@@ -118,7 +118,7 @@ jQuery(document).ready(function($) {
                                         }
                                     }
                                 }
-                                
+
                                 if (sender === 'bot' && msgMode === 'ai') {
                                     var html = parseMarkdown(msg.content);
                                     appendMessage(html, sender, true, msgTime, msgMode);
@@ -127,7 +127,7 @@ jQuery(document).ready(function($) {
                                     appendMessage(html, sender, true, msgTime, msgMode);
                                 }
                             });
-                            
+
                             loadedHistoryCount = msgs.length;
                             scrollToBottom(false, 'ai');
                             scrollToBottom(false, 'human');
@@ -141,7 +141,7 @@ jQuery(document).ready(function($) {
             if (typeof aiChatbotVars !== 'undefined' && aiChatbotVars.require_lead !== undefined) {
                 requireLeadForm = aiChatbotVars.require_lead === '1';
             }
-        } catch(e) {}
+        } catch (e) { }
 
         if (requireLeadForm && !hasLeadSubmitted) {
             leadOverlay.removeClass('ai_chatbot-hidden').show();
@@ -153,7 +153,7 @@ jQuery(document).ready(function($) {
             inputArea.removeClass('ai_chatbot-hidden').show();
             inputField.prop('disabled', false);
             submitBtn.prop('disabled', false);
-            
+
             if (leadName) {
                 var nameParts = leadName.trim().split(/\s+/);
                 var firstName = nameParts.length > 0 ? nameParts[nameParts.length - 1] : '';
@@ -166,28 +166,28 @@ jQuery(document).ready(function($) {
 
         // Load history on page load
         if (sessionId) {
-            setTimeout(function() { loadHistory(); }, 100);
+            setTimeout(function () { loadHistory(); }, 100);
         }
 
         // Lead Form Submit
-        leadForm.on('submit', function(e) {
+        leadForm.on('submit', function (e) {
             e.preventDefault();
-            
+
             var nameValue = $('#' + id + '-lead-name').val().trim();
             var emailValue = $('#' + id + '-lead-email').val().trim();
             var phoneValue = $('#' + id + '-lead-phone').val().trim();
-            
+
             if (!nameValue || !emailValue || !phoneValue) {
                 leadError.text('Vui lòng nhập đầy đủ thông tin bắt buộc.').show();
                 return;
             }
-            
+
             leadSubmit.prop('disabled', true).text('Đang xử lý...');
             leadError.hide();
-            
+
             var ajaxUrl = (typeof aiChatbotVars !== 'undefined' && aiChatbotVars.ajax_url) ? aiChatbotVars.ajax_url : '/wp-admin/admin-ajax.php';
             var nonceValue = (typeof aiChatbotVars !== 'undefined' && aiChatbotVars.nonce) ? aiChatbotVars.nonce : '';
-            
+
             try {
                 $.ajax({
                     url: ajaxUrl,
@@ -199,11 +199,11 @@ jQuery(document).ready(function($) {
                         email: emailValue,
                         phone: phoneValue
                     },
-                    success: function(response) {
+                    success: function (response) {
                         if (typeof response === 'string') {
-                            try { response = JSON.parse(response); } catch(e) {}
+                            try { response = JSON.parse(response); } catch (e) { }
                         }
-                        
+
                         if (response && response.success) {
                             try {
                                 localStorage.setItem('ai_chatbot_lead_submitted', 'true');
@@ -211,8 +211,8 @@ jQuery(document).ready(function($) {
                                     localStorage.setItem('ai_chatbot_lead_name', nameValue);
                                     leadName = nameValue;
                                 }
-                            } catch(e) {}
-                            
+                            } catch (e) { }
+
                             var firstName = 'bạn';
                             if (nameValue) {
                                 var nameParts = nameValue.trim().split(/\s+/);
@@ -220,19 +220,19 @@ jQuery(document).ready(function($) {
                                     firstName = nameParts[nameParts.length - 1];
                                 }
                             }
-                            
+
                             var welcomeGreeting = 'Trường Cao đẳng Kinh tế Công nghệ Hà Nội xin chào ' + firstName + '! Chúng tôi có thể giúp gì cho bạn hôm nay?';
                             messagesViewport.find('.ai_chatbot-msg-wrapper.bot:first .ai_chatbot-msg-bubble p').text(welcomeGreeting);
-                            
-                            setTimeout(function() {
+
+                            setTimeout(function () {
                                 saveMessage('bot', welcomeGreeting, 'ai');
                                 // Only increment local history count if we append directly, but we let polling/reload handle it later
                             }, 200);
 
                             leadOverlay.addClass('ai_chatbot-hidden');
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 leadOverlay.hide();
-                                inputArea.removeClass('ai_chatbot-hidden').hide().fadeIn(400, function() {
+                                inputArea.removeClass('ai_chatbot-hidden').hide().fadeIn(400, function () {
                                     inputField.prop('disabled', false).focus();
                                     submitBtn.prop('disabled', false);
                                 });
@@ -246,7 +246,7 @@ jQuery(document).ready(function($) {
                             leadSubmit.prop('disabled', false).text('Bắt đầu tư vấn');
                         }
                     },
-                    error: function() {
+                    error: function () {
                         leadError.text('Có lỗi kết nối hệ thống. Vui lòng thử lại.').show();
                         leadSubmit.prop('disabled', false).text('Bắt đầu tư vấn');
                     }
@@ -256,9 +256,9 @@ jQuery(document).ready(function($) {
                 leadSubmit.prop('disabled', false).text('Bắt đầu tư vấn');
             }
         });
-        
+
         if (!isInline) {
-            bubble.on('click', function(e) {
+            bubble.on('click', function (e) {
                 e.stopPropagation();
                 if (chatWindow.hasClass('ai_chatbot-state-closed')) {
                     openChat();
@@ -266,62 +266,62 @@ jQuery(document).ready(function($) {
                     closeChat();
                 }
             });
-            
-            minimizeBtn.on('click', function(e) {
+
+            minimizeBtn.on('click', function (e) {
                 e.stopPropagation();
                 closeChat();
             });
-            
-            $(document).on('keyup', function(e) {
+
+            $(document).on('keyup', function (e) {
                 if (e.key === "Escape" && !chatWindow.hasClass('ai_chatbot-state-closed')) {
                     closeChat();
                 }
             });
 
-            chatWindow.on('click', function(e) { e.stopPropagation(); });
+            chatWindow.on('click', function (e) { e.stopPropagation(); });
         }
-        
+
         function openChat() {
             chatWindow.removeClass('ai_chatbot-state-closed');
             bubble.find('.icon-open').hide();
             bubble.find('.icon-close').show();
             bubble.find('.ai_chatbot-pulse-dot').fadeOut(300);
-            
-            setTimeout(function() {
+
+            setTimeout(function () {
                 inputField.focus();
             }, 300);
             scrollToBottom(true, currentMode);
         }
-        
+
         function closeChat() {
             chatWindow.addClass('ai_chatbot-state-closed');
             bubble.find('.icon-close').hide();
             bubble.find('.icon-open').show();
         }
-        
+
         // AI Chat Form Submit
-        chatForm.on('submit', function(e) {
+        chatForm.on('submit', function (e) {
             e.preventDefault();
             var userText = inputField.val().trim();
             if (!userText) return;
-            
+
             // If still waiting for AI, block sending
             if (isWaitingForResponse) return;
-            
+
             isWaitingForResponse = true;
             inputField.val('');
             // Keep input ENABLED so user can type, only disable submit
             submitBtn.prop('disabled', true);
-            
+
             appendMessage(userText, 'user', false, '', 'ai');
             scrollToBottom(true, 'ai');
-            
+
             saveMessage('user', userText, 'ai');
             loadedHistoryCount++; // increment to account for user msg just saved
-            
+
             appendTypingIndicator();
             scrollToBottom(true, 'ai');
-            
+
             var ajaxUrl = (typeof aiChatbotVars !== 'undefined' && aiChatbotVars.ajax_url) ? aiChatbotVars.ajax_url : '/wp-admin/admin-ajax.php';
             var nonceValue = (typeof aiChatbotVars !== 'undefined' && aiChatbotVars.nonce) ? aiChatbotVars.nonce : '';
 
@@ -337,21 +337,21 @@ jQuery(document).ready(function($) {
                     body: formData
                 }).then(async response => {
                     if (!response.ok) throw new Error('Network response was not ok');
-                    
+
                     var reader = response.body.getReader();
                     var decoder = new TextDecoder("utf-8");
                     var fullAnswer = "";
                     var currentBoxHTML = "";
                     var currentMsgBubble = null;
                     var streamBuffer = ""; // Buffer to hold incomplete lines
-                    
+
                     while (true) {
                         const { done, value } = await reader.read();
                         if (done) break;
-                        
+
                         var chunk = decoder.decode(value, { stream: true });
                         streamBuffer += chunk;
-                        
+
                         try {
                             var parsedJson = JSON.parse(streamBuffer.trim());
                             if (parsedJson.success === false && parsedJson.data && parsedJson.data.message) {
@@ -365,11 +365,11 @@ jQuery(document).ready(function($) {
                                 fullAnswer = "[Lỗi AI Model]";
                                 break;
                             }
-                        } catch (e) {}
-                        
+                        } catch (e) { }
+
                         var lines = streamBuffer.split('\n');
                         streamBuffer = lines.pop(); // The last element is an incomplete line, put it back in the buffer
-                        
+
                         for (var i = 0; i < lines.length; i++) {
                             var line = lines[i].trim();
                             if (line.startsWith('data: ')) {
@@ -383,39 +383,39 @@ jQuery(document).ready(function($) {
                                     }
                                     continue;
                                 }
-                                
+
                                 try {
                                     var dataObj = JSON.parse(dataStr);
                                     if (dataObj.choices && dataObj.choices[0] && dataObj.choices[0].delta && dataObj.choices[0].delta.content) {
                                         var deltaText = dataObj.choices[0].delta.content;
                                         fullAnswer += deltaText;
-                                        
+
                                         currentBoxHTML = parseMarkdown(fullAnswer);
-                                        
+
                                         if (!currentMsgBubble) {
                                             removeTypingIndicator();
                                             appendMessage('', 'bot', false, '', 'ai');
                                             currentMsgBubble = messagesViewport.find('.ai_chatbot-msg-wrapper.bot:not(.ai_chatbot-typing-loader):last .ai_chatbot-msg-bubble');
                                         }
-                                        
+
                                         currentMsgBubble.html(currentBoxHTML);
                                         scrollToBottom(false, 'ai');
                                     }
-                                } catch (err) {}
+                                } catch (err) { }
                             }
                         }
                     }
-                    
+
                     if (!currentMsgBubble) {
                         removeTypingIndicator();
                     }
-                    
+
                     inputField.focus();
                     submitBtn.prop('disabled', false);
                     isWaitingForResponse = false;
                     saveMessage('bot', fullAnswer, 'ai');
                     loadedHistoryCount++;
-                    
+
                 }).catch(error => {
                     removeTypingIndicator();
                     inputField.focus();
@@ -439,34 +439,34 @@ jQuery(document).ready(function($) {
             mode = mode || 'ai';
             var timeString = time || getCurrentTime();
             var bubbleContent = isHTML ? content : escapeHtml(content);
-            
+
             var innerHtml = '';
             var bubbleHtml = '<div class="ai_chatbot-msg-bubble">' + (isHTML ? bubbleContent : '<p>' + bubbleContent + '</p>') + '</div>';
             var innerHtml = bubbleHtml;
-            
+
             var msgHtml = '<div class="ai_chatbot-msg-wrapper ' + sender + '">' + innerHtml + '</div>';
             messagesViewport.append(msgHtml);
         }
-        
+
         // Typing loader helpers
         function appendTypingIndicator() {
-            var loaderHtml = 
+            var loaderHtml =
                 '<div class="ai_chatbot-msg-wrapper bot ai_chatbot-typing-loader">' +
-                    '<div class="ai_chatbot-msg-bubble">' +
-                        '<div class="ai_chatbot-typing-indicator">' +
-                            '<span class="ai_chatbot-typing-dot"></span>' +
-                            '<span class="ai_chatbot-typing-dot"></span>' +
-                            '<span class="ai_chatbot-typing-dot"></span>' +
-                        '</div>' +
-                    '</div>' +
+                '<div class="ai_chatbot-msg-bubble">' +
+                '<div class="ai_chatbot-typing-indicator">' +
+                '<span class="ai_chatbot-typing-dot"></span>' +
+                '<span class="ai_chatbot-typing-dot"></span>' +
+                '<span class="ai_chatbot-typing-dot"></span>' +
+                '</div>' +
+                '</div>' +
                 '</div>';
             messagesViewport.append(loaderHtml);
         }
-        
+
         function removeTypingIndicator() {
             messagesViewport.find('.ai_chatbot-typing-loader').remove();
         }
-        
+
         // Scroll conversation to bottom
         function scrollToBottom(animate, mode) {
             mode = mode || 'ai';
@@ -478,7 +478,7 @@ jQuery(document).ready(function($) {
                 vp.scrollTop(scrollHeight);
             }
         }
-        
+
         function getCurrentTime() {
             var now = new Date();
             var hours = now.getHours().toString().padStart(2, '0');
@@ -496,11 +496,11 @@ jQuery(document).ready(function($) {
             var html = escapeHtml(markdownText);
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            
+
             var lines = html.split('\n');
             var listOpen = false;
             var processedLines = [];
-            
+
             for (var i = 0; i < lines.length; i++) {
                 var line = lines[i].trim();
                 if (line.startsWith('- ') || line.startsWith('* ')) {
@@ -518,11 +518,11 @@ jQuery(document).ready(function($) {
                 }
             }
             if (listOpen) processedLines.push('</ul>');
-            
+
             html = processedLines.join('\n');
             var paragraphs = html.split(/\n\n+/);
             var finalHTML = [];
-            
+
             for (var p = 0; p < paragraphs.length; p++) {
                 var pText = paragraphs[p].trim();
                 if (!pText) continue;

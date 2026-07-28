@@ -1,6 +1,6 @@
-# Installation & Configuration Guide: AI Chatbot
+# Installation & Configuration Guide: Hateco AI Chatbot
 
-Welcome to your **AI Chatbot** WordPress plugin! This plugin adds a premium, glassmorphic floating AI assistant to your WordPress website. It utilizes **Retrieval-Augmented Generation (RAG)** powered by Google Gemini, allowing it to search uploaded company documents (PDFs and Text files) locally in your WordPress database to deliver highly personalized, accurate replies.
+Welcome to your **Hateco AI Chatbot** WordPress plugin! This plugin adds a premium, glassmorphic floating AI assistant to your WordPress website. It utilizes **Retrieval-Augmented Generation (RAG)** powered by Google Gemini, allowing it to search uploaded company documents (PDFs and Text files) locally in your WordPress database to deliver highly personalized, accurate replies.
 
 ---
 
@@ -54,9 +54,9 @@ To install the chatbot onto WordPress, you will need to zip the plugin directory
 
 ## 🔑 Step 3: Configure Gemini API & Chatbot settings
 
-Upon activation, a new menu called **AI Chatbot** will appear in your WordPress sidebar.
+Upon activation, a new menu called **Hateco AI Chatbot** will appear in your WordPress sidebar.
 
-1. Click on **AI Chatbot** > **API & Chatbot Settings**.
+1. Click on **Hateco AI Chatbot** > **API & Chatbot Settings**.
 2. **Gemini API Key (Cấu hình bảo mật ngầm)**:
    - *Cách 1 (Nhập thủ công)*: Dán mã API key của bạn vào đây. Lấy mã miễn phí tại **[Google AI Studio](https://aistudio.google.com/)**.
    - *Cách 2 (Khuyên dùng - Ẩn hoàn toàn)*: Để ẩn API key hoàn toàn không cho người quản trị website nhìn thấy, hãy mở tệp `wp-config.php` hoặc file mã nguồn của WordPress và thêm dòng khai báo sau:
@@ -82,7 +82,7 @@ Upon activation, a new menu called **AI Chatbot** will appear in your WordPress 
 
 This is where the magic of Retrieval-Augmented Generation happens. Instead of relying on general knowledge, you can upload specific documents to customize the AI's intelligence:
 
-1. Inside **AI Chatbot**, switch to the **Knowledge Base Files** tab.
+1. Inside **Hateco AI Chatbot**, switch to the **Knowledge Base Files** tab.
 2. Drag and drop a `.txt` or `.pdf` document (such as a pricing page, FAQ list, user guide, or company profile) into the dashed upload area, or click it to choose a file.
 3. The system will automatically:
    - Extract the plain text from the file (using a lightweight, pure PHP FlateDecode stream parser for PDF).
@@ -118,7 +118,7 @@ To embed the chatbot directly inside a specific page, post, or layout area (e.g.
 ## 👥 Step 6: Quản lý thông tin khách hàng (Customer Leads)
 
 Nếu bạn bật tính năng **Lead Capture** (Thu thập thông tin khách hàng):
-1. Truy cập vào **AI Chatbot** > Chọn tab **Thông tin khách hàng (Leads)**.
+1. Truy cập vào **Hateco AI Chatbot** > Chọn tab **Thông tin khách hàng (Leads)**.
 2. Tại đây bạn sẽ thấy danh sách đầy đủ tất cả khách hàng đã đăng ký trước khi trò chuyện cùng AI, bao gồm:
    - **Họ và tên**: Tên khách hàng đăng ký.
    - **Địa chỉ Email**: Nhấp vào email để gửi thư trực tiếp cho khách hàng.
