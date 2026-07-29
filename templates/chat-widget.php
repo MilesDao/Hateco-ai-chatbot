@@ -15,7 +15,7 @@ $is_inline = isset($is_inline) && $is_inline;
 
 $primary_color = get_option('ai_chatbot_primary_color', '#0ea5e9');
 $welcome_msg = get_option('ai_chatbot_welcome_message', 'Trường Cao đẳng Kinh tế Công nghệ Hà Nội xin chào! Chúng tôi có thể giúp gì cho bạn hôm nay?');
-$bot_name = get_option('ai_chatbot_bot_name', 'Hateco Hateco AI Chatbot');
+$bot_name = get_option('ai_chatbot_bot_name', 'Hateco AI Chatbot');
 
 // Unique ID suffix to prevent DOM collisions
 $widget_id = $is_inline ? 'ai_chatbot-chat-inline' : 'ai_chatbot-chat-floating';
