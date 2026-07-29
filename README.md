@@ -1,6 +1,6 @@
 # Installation & Configuration Guide: Hateco AI Chatbot
 
-Welcome to your **Hateco AI Chatbot** WordPress plugin! This plugin adds a premium, glassmorphic floating AI assistant to your WordPress website. It utilizes **Retrieval-Augmented Generation (RAG)** powered by Google Gemini, allowing it to search uploaded company documents (PDFs and Text files) locally in your WordPress database to deliver highly personalized, accurate replies.
+Welcome to your **Hateco AI Chatbot** WordPress plugin! This plugin adds a premium, glassmorphic floating AI assistant to your WordPress website. It utilizes **Retrieval-Augmented Generation (RAG)** powered by OpenRouter (supporting models like Google Gemini, DeepSeek, OpenAI, etc.), allowing it to search uploaded company documents (PDFs and Text files) locally in your WordPress database to deliver highly personalized, accurate replies.
 
 ---
 
@@ -14,7 +14,7 @@ plugin-chatbot-ai/
 ├── instruction.md                 # This instruction file
 ├── includes/
 │   ├── class-admin-settings.php   # Admin settings & document dashboard
-│   ├── class-ai_chatbot-client.php    # Network controller for Gemini API
+│   ├── class-openrouter-client.php # Network controller for OpenRouter API
 │   └── class-rag-manager.php      # PDF/TXT parsing, chunking, and similarity search
 ├── templates/
 │   └── chat-widget.php            # Chat widget HTML layout
@@ -52,26 +52,29 @@ To install the chatbot onto WordPress, you will need to zip the plugin directory
 
 ---
 
-## 🔑 Step 3: Configure Gemini API & Chatbot settings
+## 🔑 Step 3: Configure OpenRouter API & Chatbot settings
 
 Upon activation, a new menu called **Hateco AI Chatbot** will appear in your WordPress sidebar.
 
 1. Click on **Hateco AI Chatbot** > **API & Chatbot Settings**.
-2. **Gemini API Key (Cấu hình bảo mật ngầm)**:
-   - *Cách 1 (Nhập thủ công)*: Dán mã API key của bạn vào đây. Lấy mã miễn phí tại **[Google AI Studio](https://aistudio.google.com/)**.
+2. **OpenRouter API Key (Cấu hình bảo mật ngầm)**:
+   - *Cách 1 (Nhập thủ công)*: Dán mã API key của bạn vào đây. Lấy mã tại **[OpenRouter.ai](https://openrouter.ai/)**.
    - *Cách 2 (Khuyên dùng - Ẩn hoàn toàn)*: Để ẩn API key hoàn toàn không cho người quản trị website nhìn thấy, hãy mở tệp `wp-config.php` hoặc file mã nguồn của WordPress và thêm dòng khai báo sau:
      ```php
-     define( 'GEMINI_API_KEY', 'MÃ_API_KEY_CỦA_BẠN_Ở_ĐÂY' );
+     define( 'OPENROUTER_API_KEY', 'MÃ_API_KEY_CỦA_BẠN_Ở_ĐÂY' );
      ```
      Sau khi cấu hình bằng cách này, ô nhập API Key trong trang quản trị sẽ tự động khóa lại và ẩn đi: **"✔ Khóa API đã được cấu hình ngầm bảo mật trong mã nguồn (Hệ thống ẩn)."**
 3. **Floating Widget**: Toggle whether the floating chat bubble should automatically appear in the bottom-right corner across your entire site.
-4. **Thu thập thông tin khách hàng (Lead Capture)**: Bật/tắt tính năng bắt buộc khách hàng nhập Tên, Email, SĐT trước khi trò chuyện cùng AI.
+4. **Thu thập thông tin khách hàng (Lead Capture)**: Chọn **"Tự động bóc tách & Lưu SĐT khi trò chuyện với AI"**. Tính năng này loại bỏ form đăng ký phiền phức, cho phép khách hàng chat ngay lập tức. Nếu AI yêu cầu để lại thông tin và khách gửi Số điện thoại, hệ thống sẽ tự động trích xuất Tên, SĐT và nội dung quan tâm vào Bảng Quản Lý.
 5. **Theme Color**: Use the interactive color picker to choose your branding color (the default is a premium electric-blue `#0ea5e9`).
 6. **Welcome Message**: Set the introductory message that greets users when they open the chat pane.
 7. **AI Bot Persona / System Instructions**: Define the chatbot's behavior, tone of voice, or restrictions.
    * *Example*: `"You are a polite receptionist for ACME Corp. Answer questions concisely using only the text snippets."*
-8. **Advanced Settings (Default values recommended)**:
-   - *Context Chunk Count (Top K)*: The number of most relevant matching snippets sent to Gemini (recommended: `3` or `4`).
+8. **Advanced RAG Settings (Default values recommended)**:
+   - *Chat Model*: OpenRouter ID for chat generation (default: `google/gemini-2.5-flash`).
+   - *Embedding Model*: OpenRouter ID for vectorization (default: `qwen/qwen3-embedding-8b`).
+   - *Reranker Model*: Cohere Reranker ID (default: `cohere/rerank-v3.5`).
+   - *Context Chunk Count (Top K)*: The number of most relevant matching snippets retrieved (recommended: `3` or `4`).
    - *Chunk Size*: Maximum characters per chunk (`1000`).
    - *Chunk Overlap*: Character overlap between adjacent chunks (`200`).
 9. Click **Save Configuration**.
@@ -87,7 +90,7 @@ This is where the magic of Retrieval-Augmented Generation happens. Instead of re
 3. The system will automatically:
    - Extract the plain text from the file (using a lightweight, pure PHP FlateDecode stream parser for PDF).
    - Divide the text into logical, overlapping blocks (snapping to word boundaries so sentences aren't split in half).
-   - Call Gemini's `text-embedding-004` model to compute a 768-dimension vector embedding for each block.
+   - Call the configured OpenRouter embedding model (e.g., `qwen/qwen3-embedding-8b`) to compute a 768-dimension vector embedding for each block.
    - Store the chunks and embedding vectors locally in custom MySQL tables (`{wp_prefix}ai_chatbot_chunks` and `{wp_prefix}ai_chatbot_documents`).
 4. Once completed, your file will appear in the **Ingested Documents** table, showing the size, status, and number of created chunks.
 
@@ -115,16 +118,18 @@ To embed the chatbot directly inside a specific page, post, or layout area (e.g.
 
 ---
 
-## 👥 Step 6: Quản lý thông tin khách hàng (Customer Leads)
+## 👥 Step 6: Bảng quản lý Lead Thông minh (Conversational Lead Capture)
 
-Nếu bạn bật tính năng **Lead Capture** (Thu thập thông tin khách hàng):
-1. Truy cập vào **Hateco AI Chatbot** > Chọn tab **Thông tin khách hàng (Leads)**.
-2. Tại đây bạn sẽ thấy danh sách đầy đủ tất cả khách hàng đã đăng ký trước khi trò chuyện cùng AI, bao gồm:
-   - **Họ và tên**: Tên khách hàng đăng ký.
-   - **Địa chỉ Email**: Nhấp vào email để gửi thư trực tiếp cho khách hàng.
+Với tính năng **Lead Capture** tự động:
+1. Khách hàng **không cần phải điền form** trước khi chat. Khung chat luôn sẵn sàng ngay khi mở.
+2. Bất cứ khi nào khách hàng cung cấp số điện thoại trong lúc trò chuyện (VD: *"Mình tên là Trung, số điện thoại là 0985282393"*), Hệ thống AI sẽ tự động phân tách và lưu thông tin ngay lập tức.
+3. Truy cập vào **Hateco AI Chatbot** > Chọn tab **Thông tin khách hàng (Leads)**.
+4. Tại đây bạn sẽ thấy danh sách khách hàng tiềm năng đã để lại SĐT qua khung chat, bao gồm:
+   - **Họ và tên**: Tên khách hàng (được AI bóc tách thông minh từ câu nói).
    - **Số điện thoại**: Số điện thoại liên hệ để gọi điện tư vấn.
-   - **Thời gian đăng ký**: Thời điểm khách hàng điền form đăng ký.
-3. Người quản trị có thể xóa thông tin khách hàng bằng cách nhấn nút **Xóa** ở cột Thao tác. Hành động này sẽ được thực hiện qua cơ chế AJAX an toàn và bảo mật.
+   - **Nội dung quan tâm / Ghi chú**: Lưu lại câu hỏi hoặc chuyên ngành mà khách hàng đang quan tâm ngay trước khi để lại SĐT.
+   - **Thời gian ghi nhận**: Thời điểm AI thu thập thông tin.
+5. Người quản trị có thể quản lý, liên hệ tư vấn chuyên sâu dựa trên ngữ cảnh câu hỏi, hoặc xóa thông tin nếu không cần thiết.
 
 ---
 
@@ -132,17 +137,17 @@ Nếu bạn bật tính năng **Lead Capture** (Thu thập thông tin khách hà
 
 When a visitor types a question in the chat widget:
 1. The widget triggers a secure WordPress AJAX request (`wp_ajax_ai_chatbot_chat_query`).
-2. The RAG Manager vectorizes the user's question using Gemini's embedding API.
+2. The RAG Manager vectorizes the user's question using OpenRouter's embedding API.
 3. It performs a **high-speed Cosine Similarity** comparison between the question vector and all document chunks stored in your MySQL database.
-4. It extracts the top $K$ most similar text chunks (matching content) in milliseconds.
-5. It packs these relevant chunks as context alongside your system prompt, sending them to **`ai_chatbot-2.5-flash`** for a highly specialized, context-aware reply.
+4. It extracts the top $K$ most similar text chunks (matching content) in milliseconds and optionally reranks them via Cohere.
+5. It packs these relevant chunks as context alongside your system prompt, sending them to your selected OpenRouter model (default: `google/gemini-2.5-flash`) for a highly specialized, context-aware reply.
 6. The frontend renders the result, formatting lists and bold text on the fly using a secure HTML markdown converter.
 
 ---
 
 ## 🔍 Troubleshooting
 
-* **Chat says "Gemini API Error: Embeddings API returned HTTP 403..."**: Your Gemini API key is incorrect or has expired. Generate a new key in Google AI Studio and update your plugin settings.
+* **Chat says "OpenRouter API Error: Embeddings API returned HTTP 401/403..."**: Your OpenRouter API key is incorrect or has expired. Generate a new key in OpenRouter.ai and update your plugin settings.
 * **Uploaded PDF files show 0 chunks**: Ensure the PDF is a text-based PDF (not scanned images of text). The PHP PDF extractor reads text streams. Scanned PDFs require OCR, which is not supported natively.
 * **Large files fail to upload**: Check your WordPress maximum upload limit (normally 2MB - 128MB). We recommend uploading smaller, modular files (under 2MB) for optimal indexing speeds.
 * **Chat doesn't open when the bubble is clicked**: Verify that jQuery is enqueued correctly on your theme (standard for almost all WordPress themes). Check the browser Console (F12) for JavaScript errors.
