@@ -74,7 +74,7 @@ Upon activation, a new menu called **Hateco AI Chatbot** will appear in your Wor
    - *Chat Model*: OpenRouter ID for chat generation (default: `google/gemini-2.5-flash`).
    - *Embedding Model*: OpenRouter ID for vectorization (default: `qwen/qwen3-embedding-8b`).
    - *Reranker Model*: Cohere Reranker ID (default: `cohere/rerank-v3.5`).
-   - *Context Chunk Count (Top K)*: The number of most relevant matching snippets retrieved (recommended: `3` or `4`).
+   - *Context Chunk Count (Top K)*: The number of most relevant matching snippets retrieved (recommended: `20` or `25` to ensure maximum context coverage).
    - *Chunk Size*: Maximum characters per chunk (`1000`).
    - *Chunk Overlap*: Character overlap between adjacent chunks (`200`).
 9. Click **Save Configuration**.
@@ -91,11 +91,11 @@ This is where the magic of Retrieval-Augmented Generation happens. Instead of re
    - Extract the plain text from the file (using a lightweight, pure PHP FlateDecode stream parser for PDF).
    - Divide the text into logical, overlapping blocks (snapping to word boundaries so sentences aren't split in half).
    - Call the configured OpenRouter embedding model (e.g., `qwen/qwen3-embedding-8b`) to compute a 768-dimension vector embedding for each block.
-   - Store the chunks and embedding vectors locally in custom MySQL tables (`{wp_prefix}ai_chatbot_chunks` and `{wp_prefix}ai_chatbot_documents`).
+   - Store the chunks locally in custom MySQL tables (`{wp_prefix}ai_chatbot_chunks` and `{wp_prefix}ai_chatbot_documents`) and sync the embedding vectors to your Pinecone Vector Database.
 4. Once completed, your file will appear in the **Ingested Documents** table, showing the size, status, and number of created chunks.
 
 > [!NOTE]
-> Storing the embeddings locally inside your own WordPress database is **100% free** and fully self-contained. It eliminates the need for expensive third-party cloud vector database subscriptions!
+> The plugin uses a robust **Hybrid RAG** system. It combines Dense Vector Search (via Pinecone) and Sparse Keyword Search (via MySQL Fulltext) with Reciprocal Rank Fusion (RRF). This guarantees maximum context retrieval accuracy even if one system fails.
 
 ---
 
@@ -138,8 +138,8 @@ Với tính năng **Lead Capture** tự động:
 When a visitor types a question in the chat widget:
 1. The widget triggers a secure WordPress AJAX request (`wp_ajax_ai_chatbot_chat_query`).
 2. The RAG Manager vectorizes the user's question using OpenRouter's embedding API.
-3. It performs a **high-speed Cosine Similarity** comparison between the question vector and all document chunks stored in your MySQL database.
-4. It extracts the top $K$ most similar text chunks (matching content) in milliseconds and optionally reranks them via Cohere.
+3. It performs a **high-speed Hybrid Search** by computing Cosine Similarity in Pinecone (Dense) and matching keywords in MySQL (Sparse).
+4. It extracts the top $K$ most similar text chunks, merges them using Reciprocal Rank Fusion (RRF), and optionally reranks them via Cohere.
 5. It packs these relevant chunks as context alongside your system prompt, sending them to your selected OpenRouter model (default: `google/gemini-2.5-flash`) for a highly specialized, context-aware reply.
 6. The frontend renders the result, formatting lists and bold text on the fly using a secure HTML markdown converter.
 

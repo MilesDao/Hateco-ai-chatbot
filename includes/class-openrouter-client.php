@@ -151,6 +151,7 @@ class OpenRouter_API_Client {
      * @return string|WP_Error Generated answer string, or WP_Error.
      */
     public function generate_chat_answer( $message, $system_instruction, $history = array() ) {
+        $endpoint = "{$this->base_url}/chat/completions";
         $messages = array();
 
         // Use proper system role for context — this is much faster than stuffing in user message
@@ -176,7 +177,7 @@ class OpenRouter_API_Client {
         $body = array(
             'model' => $this->chat_model,
             'messages' => $messages,
-            'temperature' => 0.1,
+            'temperature' => 0.4,
             'max_tokens' => 500
         );
 
@@ -246,7 +247,7 @@ class OpenRouter_API_Client {
             'model'       => $this->chat_model,
             'messages'    => $messages,
             'stream'      => true,
-            'temperature' => 0.1,
+            'temperature' => 0.4,
             'max_tokens'  => 500
         );
 

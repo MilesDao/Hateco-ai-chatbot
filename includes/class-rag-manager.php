@@ -386,7 +386,7 @@ class AI_Chatbot_Manager
      * @param int $k Number of chunks to return.
      * @return array Array of associative arrays containing chunks: [ 'content', 'document_name', 'similarity' ]
      */
-    public function search_similar_chunks($query, $k = 5, $threshold = 0.25)
+    public function search_similar_chunks($query, $k = 5, $threshold = 0.0)
     {
         global $wpdb;
 
@@ -405,7 +405,7 @@ class AI_Chatbot_Manager
         $boolean_query = '';
         foreach ($words as $word) {
             if (strlen($word) > 2) {
-                $boolean_query .= '+' . $word . '* ';
+                $boolean_query .= $word . '* ';
             }
         }
         $boolean_query = trim($boolean_query);

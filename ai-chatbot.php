@@ -358,6 +358,20 @@ class AI_Chatbot_Chatbot
                 ),
                 array('%s', '%s', '%s', '%s')
             );
+
+            // Update conversation lead name and trigger webhook
+            if (!empty($session_id)) {
+                $table_conversations = $wpdb->prefix . 'ai_chatbot_conversations';
+                $wpdb->update(
+                    $table_conversations,
+                    array('lead_name' => $captured_name . ' - ' . $captured_phone),
+                    array('session_id' => $session_id),
+                    array('%s'),
+                    array('%s')
+                );
+
+                $this->send_to_google_sheets_webhook('LEAD', $session_id, array('lead_name' => $captured_name . ' - ' . $captured_phone));
+            }
         }
 
         // ==========================================
@@ -432,8 +446,8 @@ class AI_Chatbot_Chatbot
         $chunks_text = "";
 
         if (!$is_small_talk) {
-            // 2. Fetch relevant chunks from the database/Pinecone
-            $k = intval(get_option('ai_chatbot_top_k', '5'));
+            // Force top_k to at least 25 to fix missing context issues, even if DB has 5 saved
+            $k = max(25, intval(get_option('ai_chatbot_top_k', '25')));
             $relevant_chunks = $rag_manager->search_similar_chunks($search_query, $k);
 
             // 2. Format context from database/Pinecone
@@ -445,7 +459,7 @@ class AI_Chatbot_Chatbot
                     if (isset($chunk['metadata']) && !empty($chunk['metadata'])) {
                         $meta_str = " (Meta: " . $chunk['metadata'] . ")";
                     }
-                    $chunks_text .= "Đoạn trích " . ($idx + 1) . " (Tệp nguồn: $doc_name)$meta_str:\n" . $chunk['content'] . "\n\n";
+                    $chunks_text .= "Đoạn trích " . ($idx + 1) . "$meta_str:\n" . $chunk['content'] . "\n\n";
                 }
             } else {
                 $chunks_text = "Không có tài liệu nào liên quan.";
@@ -453,19 +467,21 @@ class AI_Chatbot_Chatbot
         }
 
         // Custom system prompt/persona from settings
-        $default_prompt = "Bạn là Trợ lý AI tư vấn tuyển sinh chính thức của trường Cao đẳng Kinh tế Công nghệ Hà Nội (Hateco). Xưng mình, gọi người dùng là bạn.
+        $default_prompt = "Bạn là Trợ lý AI tư vấn tuyển sinh chính thức của trường Cao đẳng Kinh tế Công nghệ Hà Nội (Hateco) Hỗ trợ giải đáp thắc mắc, tư vấn chọn ngành, hướng dẫn thủ tục xét tuyển cho học sinh, phụ huynh quan tâm đến trường HATECO. Xưng \"mình\", gọi người dùng là \"bạn\".
 
 [KHO TRI THỨC]
 {context}
 [/KHO TRI THỨC]
 
-QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
-1. CHỈ ĐƯỢC PHÉP sử dụng thông tin và số liệu có mặt chính xác trong [KHO TRI THỨC]. TUYỆT ĐỐI KHÔNG tự suy đoán hay bịa đặt bất kỳ thông tin nào (học phí, điều kiện, ngành học...) nếu không có trong tài liệu.
-2. Nếu thông tin không có trong [KHO TRI THỨC], bắt buộc trả lời: \"Dạ, phần này bên mình chưa có thông tin chính thức. Bạn có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?\"
-3. Trả lời thẳng thắn, rõ ràng, ngắn gọn và tập trung trực tiếp vào câu hỏi của người dùng. Liệt kê gạch đầu dòng nếu có nhiều ý.
-4. Có thể kết thúc bằng 1 câu hỏi lịch sự để tiếp tục hội thoại phù hợp với ngữ cảnh, nhưng ưu tiên độ chính xác tuyệt đối.";
+QUY TẮC BẮT BUỘC:
+1. Dựa vào [KHO TRI THỨC] để trả lời một cách thân thiện, nhiệt tình.
+2. Trình bày các danh sách (ví dụ: danh sách ngành học) bằng dấu cộng (+) rõ ràng ở đầu mỗi dòng.
+3. Có thể kết thúc câu trả lời bằng những câu hỏi gợi mở thân thiện như \"Bạn đang quan tâm đến ngành nào?\" hoặc \"Để mình tư vấn kỹ hơn cho bạn nhé.\"
+4. KHÔNG tự bịa đặt bất kỳ thông tin, số liệu, học phí, hay ngành học nào KHÔNG có trong tài liệu.
+5. Nếu thông tin HOÀN TOÀN KHÔNG CÓ trong [KHO TRI THỨC], mới trả lời đúng 1 câu: \"Dạ, phần này bên mình chưa có thông tin chính thức. Bạn có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?\"";
 
-        $system_prompt = get_option('ai_chatbot_system_prompt', $default_prompt);
+        // Force the new prompt by bypassing the database option which holds the old one
+        $system_prompt = $default_prompt;
 
         // Inject context into the prompt
         if (strpos($system_prompt, '{context}') !== false) {
@@ -481,6 +497,27 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
         }
 
         // History is now handled above
+
+        // Eval mode: Return JSON with context instead of calling LLM with SSE
+        $eval_mode = isset($_POST['eval_mode']) ? sanitize_text_field(wp_unslash($_POST['eval_mode'])) : '0';
+        if ($eval_mode === '1') {
+            // Generate answer synchronously instead of streaming
+            $answer = $client->generate_chat_answer($message, $context_text, $history);
+
+            // Extract raw contexts for eval
+            $raw_contexts = array();
+            if (isset($relevant_chunks) && is_array($relevant_chunks)) {
+                foreach ($relevant_chunks as $chunk) {
+                    $raw_contexts[] = $chunk['content'];
+                }
+            }
+
+            wp_send_json_success(array(
+                'answer' => is_wp_error($answer) ? $answer->get_error_message() : $answer,
+                'contexts' => $raw_contexts
+            ));
+            exit;
+        }
 
         // 4. Make OpenRouter API chat call with Streaming
         $client->generate_chat_answer_stream($message, $context_text, $history);
@@ -522,6 +559,21 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
             wp_send_json_error(array('message' => 'Không thể lưu thông tin. Vui lòng thử lại.'));
         }
 
+        // Webhook for explicit lead form submit
+        $session_id = isset($_POST['session_id']) ? sanitize_text_field(wp_unslash($_POST['session_id'])) : '';
+        if (!empty($session_id)) {
+            $table_conversations = $wpdb->prefix . 'ai_chatbot_conversations';
+            $wpdb->update(
+                $table_conversations,
+                array('lead_name' => $name . ' - ' . $phone),
+                array('session_id' => $session_id),
+                array('%s'),
+                array('%s')
+            );
+
+            $this->send_to_google_sheets_webhook('LEAD', $session_id, array('lead_name' => $name . ' - ' . $phone));
+        }
+
         wp_send_json_success(array('message' => 'Thông tin đăng ký thành công!'));
     }
 
@@ -558,10 +610,12 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
             $session_id
         ));
 
+        $is_new_lead = false;
         if ($conversation) {
             $conversation_id = $conversation->id;
             // Update lead_name if provided
             if (!empty($lead_name) && empty($conversation->lead_name)) {
+                $is_new_lead = true;
                 $wpdb->update(
                     $table_conversations,
                     array('lead_name' => $lead_name, 'updated_at' => current_time('mysql'), 'status' => $chat_type === 'human' ? 'human' : 'bot'),
@@ -612,6 +666,17 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
         if (!$inserted) {
             wp_send_json_error(array('message' => 'Could not save message.'));
         }
+
+        if ($is_new_lead) {
+            $this->send_to_google_sheets_webhook('LEAD', $session_id, array('lead_name' => $lead_name));
+        }
+
+        $this->send_to_google_sheets_webhook('MESSAGE', $session_id, array(
+            'role' => $role,
+            'content' => $content,
+            'chat_type' => $chat_type,
+            'lead_name' => $lead_name
+        ));
 
         wp_send_json_success(array(
             'message_id' => $wpdb->insert_id,
@@ -685,6 +750,55 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
         );
 
         wp_send_json_success();
+    }
+
+    private function send_to_google_sheets_webhook($type, $session_id, $data)
+    {
+        $webhook_url = get_option('ai_chatbot_google_sheets_webhook', '');
+        if (empty($webhook_url)) {
+            return;
+        }
+
+        if ($type === 'LEAD') {
+            global $wpdb;
+            $table_conversations = $wpdb->prefix . 'ai_chatbot_conversations';
+            $table_messages = $wpdb->prefix . 'ai_chatbot_messages';
+
+            $conversation = $wpdb->get_row($wpdb->prepare("SELECT id FROM $table_conversations WHERE session_id = %s", $session_id));
+            if ($conversation) {
+                $messages = $wpdb->get_results($wpdb->prepare("SELECT role, content FROM $table_messages WHERE conversation_id = %d ORDER BY created_at ASC", $conversation->id), ARRAY_A);
+
+                $history_text = "";
+                foreach ($messages as $msg) {
+                    $sender = $msg['role'] === 'user' ? 'Khách hàng' : 'Chatbot';
+                    $history_text .= "[$sender] " . wp_strip_all_tags($msg['content']) . "\n\n";
+                }
+                $data['history'] = trim($history_text);
+            }
+        }
+
+        $payload = array(
+            'type' => $type,
+            'session_id' => $session_id,
+            'data' => $data
+        );
+
+        $response = wp_remote_post($webhook_url, array(
+            'method' => 'POST',
+            'timeout' => 15,
+            'blocking' => true,
+            'headers' => array('Content-Type' => 'application/json'),
+            'body' => wp_json_encode($payload)
+        ));
+
+        if (is_wp_error($response)) {
+            error_log('AI Chatbot Webhook Error: ' . $response->get_error_message());
+        } else {
+            $status_code = wp_remote_retrieve_response_code($response);
+            if ($status_code >= 400) {
+                error_log('AI Chatbot Webhook HTTP Error: ' . $status_code . ' - ' . wp_remote_retrieve_body($response));
+            }
+        }
     }
 }
 

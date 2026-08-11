@@ -20,3 +20,8 @@ Thumbs.db
 graphify-out/
 .gemini/
 scratch/
+.codegraph/
+
+# Plugin zip and outputs
+hateco-chatbot*.zip
+eval/test_report.csv

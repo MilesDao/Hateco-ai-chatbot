@@ -66,6 +66,7 @@ class AI_Chatbot_Admin_Settings
         register_setting('ai_chatbot_options', 'ai_chatbot_top_k');
         register_setting('ai_chatbot_options', 'ai_chatbot_pinecone_api_key');
         register_setting('ai_chatbot_options', 'ai_chatbot_pinecone_host');
+        register_setting('ai_chatbot_options', 'ai_chatbot_google_sheets_webhook');
     }
 
     /**
@@ -117,17 +118,18 @@ class AI_Chatbot_Admin_Settings
         $primary_color = get_option('ai_chatbot_primary_color', '#0ea5e9');
         $welcome_msg = get_option('ai_chatbot_welcome_message', 'Trường Cao đẳng Kinh tế Công nghệ Hà Nội xin chào! Chúng tôi có thể giúp gì cho bạn hôm nay?');
 
-        $default_prompt = "Bạn là Trợ lý AI tư vấn tuyển sinh chính thức của trường Cao đẳng Kinh tế Công nghệ Hà Nội (Hateco). Xưng mình, gọi người dùng là bạn.
+        $default_prompt = "Bạn là Trợ lý AI tư vấn tuyển sinh chính thức của trường Cao đẳng Kinh tế Công nghệ Hà Nội (Hateco) Hỗ trợ giải đáp thắc mắc, tư vấn chọn ngành, hướng dẫn thủ tục xét tuyển cho học sinh, phụ huynh quan tâm đến trường HATECO. Xưng \"mình\", gọi người dùng là \"bạn\".
 
 [KHO TRI THỨC]
 {context}
 [/KHO TRI THỨC]
 
 QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
-1. CHỈ ĐƯỢC PHÉP sử dụng thông tin và số liệu có mặt chính xác trong [KHO TRI THỨC]. TUYỆT ĐỐI KHÔNG tự suy đoán hay bịa đặt bất kỳ thông tin nào (học phí, điều kiện, ngành học...) nếu không có trong tài liệu.
-2. Nếu thông tin không có trong [KHO TRI THỨC], bắt buộc trả lời: \"Dạ, phần này bên mình chưa có thông tin chính thức. Bạn có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?\"
-3. Trả lời thẳng thắn, rõ ràng, ngắn gọn và tập trung trực tiếp vào câu hỏi của người dùng. Liệt kê gạch đầu dòng nếu có nhiều ý.
-4. Có thể kết thúc bằng 1 câu hỏi lịch sự để tiếp tục hội thoại phù hợp với ngữ cảnh, nhưng ưu tiên độ chính xác tuyệt đối.";
+1. Dựa vào [KHO TRI THỨC] để trả lời một cách thân thiện, nhiệt tình.
+2. Trình bày các danh sách (ví dụ: danh sách ngành học) bằng dấu cộng (+) rõ ràng ở đầu mỗi dòng.
+3. Có thể kết thúc câu trả lời bằng những câu hỏi gợi mở thân thiện như \"Bạn đang quan tâm đến ngành nào?\" hoặc \"Để mình tư vấn kỹ hơn cho bạn nhé.\"
+4. KHÔNG tự bịa đặt bất kỳ thông tin, số liệu, học phí, hay ngành học nào KHÔNG có trong tài liệu.
+5. Nếu thông tin HOÀN TOÀN KHÔNG CÓ trong [KHO TRI THỨC], mới trả lời đúng 1 câu: \"Dạ, phần này bên mình chưa có thông tin chính thức. Bạn có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?\"";
 
         $system_prompt = get_option('ai_chatbot_system_prompt', $default_prompt);
         $chunk_size = get_option('ai_chatbot_chunk_size', '1000');
@@ -136,6 +138,7 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
 
         $pinecone_api_key = get_option('ai_chatbot_pinecone_api_key', '');
         $pinecone_host = get_option('ai_chatbot_pinecone_host', '');
+        $google_sheets_webhook = get_option('ai_chatbot_google_sheets_webhook', '');
 
         // Active Tab logic
         $active_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'settings';
@@ -409,15 +412,9 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
             <div class="ai_chatbot-tabs">
                 <a href="?page=ai-chatbot&tab=settings"
                     class="ai_chatbot-tab-link <?php echo 'settings' === $active_tab ? 'active' : ''; ?>">Cấu hình Chatbot &
-                    API</a>
+                    Giao diện</a>
                 <a href="?page=ai-chatbot&tab=kb"
                     class="ai_chatbot-tab-link <?php echo 'kb' === $active_tab ? 'active' : ''; ?>">Tài liệu</a>
-                <a href="?page=ai-chatbot&tab=leads"
-                    class="ai_chatbot-tab-link <?php echo 'leads' === $active_tab ? 'active' : ''; ?>">Thông tin khách hàng
-                    (Leads)</a>
-                <a href="?page=ai-chatbot&tab=conversations"
-                    class="ai_chatbot-tab-link <?php echo 'conversations' === $active_tab ? 'active' : ''; ?>">Lịch sử hội
-                    thoại</a>
             </div>
 
             <?php if ('settings' === $active_tab): ?>
@@ -481,6 +478,14 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
                         </div>
 
                         <div class="ai_chatbot-form-group">
+                            <label for="ai_chatbot_google_sheets_webhook">Google Sheets Webhook URL</label>
+                            <input type="text" id="ai_chatbot_google_sheets_webhook" name="ai_chatbot_google_sheets_webhook"
+                                value="<?php echo esc_attr($google_sheets_webhook); ?>"
+                                placeholder="https://script.google.com/macros/s/.../exec">
+                            <p class="description">URL của Google Apps Script Webhook để đồng bộ khách hàng và tin nhắn.</p>
+                        </div>
+
+                        <div class="ai_chatbot-form-group">
                             <label for="ai_chatbot_enable_widget">Hiển thị khung chat (Floating Bubble)</label>
                             <select id="ai_chatbot_enable_widget" name="ai_chatbot_enable_widget"
                                 style="width: 100%; max-width: 600px; padding: 10px; border-radius: 8px;">
@@ -496,10 +501,14 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
                             <label for="ai_chatbot_require_lead_form">Thu thập thông tin khách hàng (Lead Capture)</label>
                             <select id="ai_chatbot_require_lead_form" name="ai_chatbot_require_lead_form"
                                 style="width: 100%; max-width: 600px; padding: 10px; border-radius: 8px;">
-                                <option value="0" <?php selected($require_lead, '0'); ?>>Tự động bóc tách & Lưu SĐT khi trò chuyện với AI (Khuyên dùng)</option>
-                                <option value="1" <?php selected($require_lead, '1'); ?>>Bắt buộc điền Tên, Email, Số điện thoại trước khi chat (Cũ)</option>
+                                <option value="0" <?php selected($require_lead, '0'); ?>>Tự động bóc tách & Lưu SĐT khi trò chuyện
+                                    với AI (Khuyên dùng)</option>
+                                <option value="1" <?php selected($require_lead, '1'); ?>>Bắt buộc điền Tên, Email, Số điện thoại
+                                    trước khi chat (Cũ)</option>
                             </select>
-                            <p class="description">Khi chọn Tự động bóc tách, khách hàng có thể trò chuyện trực tiếp ngay lập tức. Nếu AI yêu cầu để lại thông tin và khách gửi Số điện thoại, hệ thống sẽ tự động phân tích Tên, SĐT và nội dung quan tâm để hiển thị vào Bảng Quản Lý Lead.</p>
+                            <p class="description">Khi chọn Tự động bóc tách, khách hàng có thể trò chuyện trực tiếp ngay lập tức.
+                                Nếu AI yêu cầu để lại thông tin và khách gửi Số điện thoại, hệ thống sẽ tự động phân tích Tên, SĐT
+                                và nội dung quan tâm để hiển thị vào Bảng Quản Lý Lead.</p>
                         </div>
 
                         <div class="ai_chatbot-form-group">
@@ -532,9 +541,9 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
                         <div class="ai_chatbot-form-group" style="margin-top: 15px;">
                             <label for="ai_chatbot_top_k">Số lượng đoạn trích gửi kèm (Top K)</label>
                             <input type="number" id="ai_chatbot_top_k" name="ai_chatbot_top_k"
-                                value="<?php echo esc_attr($top_k); ?>" min="1" max="10">
+                                value="<?php echo esc_attr($top_k); ?>" min="1" max="30">
                             <p class="description">Số lượng đoạn văn tài liệu khớp nhất được gửi làm bối cảnh để AI trả lời (khuyên
-                                dùng: 3 hoặc 4).</p>
+                                dùng: 10 - 15).</p>
                         </div>
 
                         <div class="ai_chatbot-form-group">
@@ -645,292 +654,6 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
                                                     <span class="dashicons dashicons-trash"
                                                         style="font-size: 16px; width: 16px; height: 16px; line-height: 16px;"></span> Xóa
                                                     dữ liệu
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach;
-                                endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            <?php elseif ('conversations' === $active_tab): ?>
-                <div class="ai_chatbot-card">
-                    <h2>Lịch sử hội thoại</h2>
-                    <p style="color: #64748b; margin-bottom: 25px; max-width: 600px;">
-                        Xem tất cả các cuộc hội thoại giữa người dùng và Hateco AI Chatbot. Nhấp vào một cuộc hội thoại để xem chi
-                        tiết tin nhắn.
-                    </p>
-
-                    <?php
-                    global $wpdb;
-                    $table_conversations = $wpdb->prefix . 'ai_chatbot_conversations';
-                    $table_messages = $wpdb->prefix . 'ai_chatbot_messages';
-                    $conversations = $wpdb->get_results(
-                        "SELECT c.*, (SELECT COUNT(*) FROM $table_messages m WHERE m.conversation_id = c.id) as msg_count
-                         FROM $table_conversations c
-                         ORDER BY c.updated_at DESC",
-                        ARRAY_A
-                    );
-                    ?>
-
-                    <div style="overflow-x: auto; margin-top: 15px;">
-                        <table class="ai_chatbot-table" id="ai_chatbot-conversations-table">
-                            <thead>
-                                <tr>
-                                    <th>Phiên</th>
-                                    <th>Khách hàng</th>
-                                    <th>Số tin nhắn</th>
-                                    <th>Bắt đầu</th>
-                                    <th>Cập nhật</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (empty($conversations)): ?>
-                                    <tr>
-                                        <td colspan="6" style="text-align: center; color: #94a3b8; padding: 30px;">Chưa có cuộc hội
-                                            thoại nào.</td>
-                                    </tr>
-                                <?php else: ?>
-                                    <?php foreach ($conversations as $conv): ?>
-                                        <tr class="ai_chatbot-conv-row" data-conv-id="<?php echo esc_attr($conv['id']); ?>"
-                                            style="cursor:pointer;">
-                                            <td style="font-family: monospace; font-size: 12px; color: #64748b;">
-                                                #<?php echo esc_html(substr($conv['session_id'], 0, 8)); ?></td>
-                                            <td style="font-weight: 600; color: #0f172a;">
-                                                <?php echo esc_html($conv['lead_name'] ?: 'Khách vãng lai'); ?>
-                                            </td>
-                                            <td style="text-align: center;"><?php echo intval($conv['msg_count']); ?></td>
-                                            <td style="color: #64748b; font-size: 13px;">
-                                                <?php echo esc_html(date('d-m-Y H:i', strtotime($conv['created_at']))); ?>
-                                            </td>
-                                            <td style="color: #64748b; font-size: 13px;">
-                                                <?php echo esc_html(date('d-m-Y H:i', strtotime($conv['updated_at']))); ?>
-                                            </td>
-                                            <td>
-                                                <button class="ai_chatbot-btn-view-conv btn-view"
-                                                    data-conv-id="<?php echo esc_attr($conv['id']); ?>">
-                                                    Xem chi tiết
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <!-- Hidden detail row -->
-                                        <tr class="ai_chatbot-conv-detail" data-conv-id="<?php echo esc_attr($conv['id']); ?>"
-                                            data-session-id="<?php echo esc_attr($conv['session_id']); ?>" style="display:none;">
-                                            <td colspan="6" style="padding: 0;">
-                                                <div
-                                                    style="background: #f8fafc; border-radius: 8px; margin: 8px; overflow: hidden; border: 1px solid #e2e8f0; max-width: 1000px; margin-left: auto; margin-right: auto; display: flex; flex-direction: column;">
-                                                    <div
-                                                        style="padding: 12px 16px; background: #ffffff; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
-                                                        <div style="font-weight: 600; color: #0f172a; font-size: 14px;">
-                                                            Trò chuyện trực tiếp
-                                                        </div>
-                                                        <button class="ai_chatbot-btn-close-conv btn-view" style="color: #64748b;"
-                                                            data-conv-id="<?php echo esc_attr($conv['id']); ?>">Đóng</button>
-                                                    </div>
-
-                                                    <div style="display: flex; flex-direction: row; height: 450px;">
-                                                        <!-- AI Chat Only -->
-                                                        <div style="flex: 1; display: flex; flex-direction: column;">
-                                                            <div
-                                                                style="padding: 10px; background: #f1f5f9; font-weight: 600; font-size: 13px; text-align: center; border-bottom: 1px solid #e2e8f0;">
-                                                                Lịch sử Chat với AI</div>
-                                                            <div id="ai_chatbot-conv-log-ai-<?php echo esc_attr($conv['id']); ?>"
-                                                                style="flex: 1; overflow-y: auto; padding: 16px; background: #ffffff; display: flex; flex-direction: column;">
-                                                                <p style="text-align:center; color:#94a3b8; font-size:13px; margin: auto;">
-                                                                    Đang tải...</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <script>
-                    jQuery(document).ready(function ($) {
-
-
-
-                        // Load conversation details
-                        function renderUnifiedMsg(msg) {
-                            var isUser = msg.role === 'user';
-                            var isAdmin = (msg.role === 'bot' && msg.chat_type === 'human');
-                            var isAI = (msg.role === 'bot' && msg.chat_type !== 'human');
-
-                            var align = isUser ? 'flex-end' : 'flex-start';
-                            var textBtnAlign = isUser ? 'right' : 'left';
-                            var bg = isUser ? '#0ea5e9' : (isAdmin ? '#e0e7ff' : '#f1f5f9');
-                            var color = isUser ? '#ffffff' : '#1e293b';
-                            var border = isAdmin ? '1px solid #c7d2fe' : 'none';
-                            var label = isUser ? 'Khách hàng' : (isAdmin ? '👤 Nhân viên' : '🤖 AI Bot');
-
-                            var html = '<div style="display: flex; flex-direction: column; align-items: ' + align + '; margin-bottom: 12px; text-align: ' + textBtnAlign + ';">';
-                            html += '<div style="max-width: 85%; background: ' + bg + '; color: ' + color + '; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; text-align: left; word-wrap: break-word; border: ' + border + ';">';
-                            html += '<div style="font-size: 11px; font-weight: 700; opacity: 0.7; margin-bottom: 4px;">' + label + '</div>';
-                            html += msg.content;
-                            html += '</div>';
-                            html += '<div style="font-size: 10px; opacity: 0.5; margin-top: 4px; padding: 0 4px;">' + msg.created_at + '</div>';
-                            html += '</div>';
-                            return html;
-                        }
-
-                        function fetchMessages(convId, forceScroll) {
-                            $.post(ajaxurl, {
-                                action: 'ai_chatbot_get_conversation_messages',
-                                conv_id: convId,
-                                nonce: '<?php echo wp_create_nonce("ai_chatbot_admin_nonce"); ?>'
-                            }, function (response) {
-                                if (response.success && response.data.messages) {
-                                    var aiHtml = '';
-                                    var humanHtml = '';
-
-                                    $.each(response.data.messages, function (i, msg) {
-                                        if (msg.chat_type === 'ai') {
-                                            aiHtml += renderUnifiedMsg(msg);
-                                        } else {
-                                            humanHtml += renderUnifiedMsg(msg);
-                                        }
-                                    });
-
-                                    var aiContainer = $('#ai_chatbot-conv-log-ai-' + convId);
-                                    var humanContainer = $('#ai_chatbot-conv-log-human-' + convId);
-
-                                    aiContainer.html(aiHtml || '<p style="text-align:center; color:#94a3b8; font-size:13px; margin: auto;">Chưa có hội thoại AI</p>');
-                                    humanContainer.html(humanHtml || '<p style="text-align:center; color:#94a3b8; font-size:13px; margin: auto;">Chưa có tin nhắn hỗ trợ</p>');
-
-                                    if (forceScroll) {
-                                        aiContainer.scrollTop(aiContainer[0].scrollHeight);
-                                        humanContainer.scrollTop(humanContainer[0].scrollHeight);
-                                    }
-                                }
-                            });
-                        }
-
-                        $('.ai_chatbot-conv-row').on('click', function () {
-                            var convId = $(this).data('conv-id');
-                            var detailRow = $('.ai_chatbot-conv-detail[data-conv-id="' + convId + '"]');
-
-                            if (detailRow.is(':visible')) {
-                                detailRow.hide();
-                                return;
-                            }
-
-                            $('.ai_chatbot-conv-detail').hide();
-                            detailRow.show();
-
-                            fetchMessages(convId, true);
-
-                            if (!detailRow.data('polling')) {
-                                var pollTimer = setInterval(function () {
-                                    if (detailRow.is(':visible')) {
-                                        fetchMessages(convId, false);
-                                    }
-                                }, 4000);
-                                detailRow.data('polling', pollTimer);
-                            }
-                        });
-
-                        $('.ai_chatbot-btn-close-conv').on('click', function (e) {
-                            e.stopPropagation();
-                            $(this).closest('.ai_chatbot-conv-detail').hide();
-                        });
-
-                        $('.ai_chatbot-btn-admin-send').on('click', function () {
-                            var btn = $(this);
-                            var convId = btn.data('conv-id');
-                            var sessionId = btn.data('session-id');
-                            var input = $('#ai_chatbot-admin-reply-' + convId);
-                            var text = input.val().trim();
-
-                            if (!text) return;
-
-                            btn.prop('disabled', true).text('...');
-                            input.prop('disabled', true);
-
-                            $.post(ajaxurl, {
-                                action: 'ai_chatbot_save_message',
-                                nonce: '<?php echo wp_create_nonce("ai_chatbot_nonce"); ?>',
-                                session_id: sessionId,
-                                role: 'bot',
-                                content: text,
-                                chat_type: 'human'
-                            }, function () {
-                                input.val('').prop('disabled', false).focus();
-                                btn.prop('disabled', false).text('Gửi');
-                                fetchMessages(convId, true);
-                            }).fail(function () {
-                                alert("Có lỗi gửi tin nhắn.");
-                                input.prop('disabled', false);
-                                btn.prop('disabled', false).text('Gửi');
-                            });
-                        });
-
-                        $('.ai_chatbot-admin-reply-input').on('keypress', function (e) {
-                            if (e.which == 13) {
-                                $(this).siblings('.ai_chatbot-btn-admin-send').click();
-                            }
-                        });
-                    });
-                </script>
-
-            <?php elseif ('leads' === $active_tab): ?>
-                <div class="ai_chatbot-card">
-                    <h2>Danh sách khách hàng đăng ký tư vấn</h2>
-                    <p style="color: #64748b; margin-bottom: 25px; max-width: 650px;">
-                        Danh sách các học sinh/khách hàng đã để lại Số điện thoại và Tên trong quá trình trò chuyện với AI (hoặc qua biểu mẫu). Bạn có thể sử dụng bảng quản lý này để liên hệ tư vấn chuyên sâu cho các em theo đúng nội dung câu hỏi đang quan tâm.
-                    </p>
-
-                    <div style="overflow-x: auto; margin-top: 15px;">
-                        <table class="ai_chatbot-table" id="ai_chatbot-leads-table">
-                            <thead>
-                                <tr>
-                                    <th>Họ và tên</th>
-                                    <th>Số điện thoại</th>
-                                    <th>Nội dung quan tâm / Ghi chú</th>
-                                    <th>Thời gian ghi nhận</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                global $wpdb;
-                                $table_leads = $wpdb->prefix . 'ai_chatbot_leads';
-                                $leads = $wpdb->get_results("SELECT * FROM $table_leads ORDER BY created_at DESC", ARRAY_A);
-
-                                if (empty($leads)): ?>
-                                    <tr class="no-leads-row">
-                                        <td colspan="5" style="text-align: center; color: #94a3b8; padding: 30px;">Chưa có khách hàng nào để lại thông tin liên hệ.</td>
-                                    </tr>
-                                <?php else:
-                                    foreach ($leads as $lead):
-                                        ?>
-                                        <tr data-lead-id="<?php echo esc_attr($lead['id']); ?>">
-                                            <td style="font-weight: 600; color: #0f172a;"><?php echo esc_html($lead['name']); ?></td>
-                                            <td style="font-weight: 600; color: #0ea5e9;"><?php echo esc_html($lead['phone']); ?></td>
-                                            <td style="color: #334155; max-width: 320px; line-height: 1.4;">
-                                                <?php 
-                                                    if (!empty($lead['note'])) {
-                                                        echo esc_html($lead['note']);
-                                                    } else {
-                                                        echo esc_html(!empty($lead['email']) ? $lead['email'] : 'Không có ghi chú');
-                                                    }
-                                                ?>
-                                            </td>
-                                            <td style="color: #64748b; font-size: 13px;">
-                                                <?php echo esc_html(date('d-m-Y H:i', strtotime($lead['created_at']))); ?>
-                                            </td>
-                                            <td>
-                                                <button class="btn-delete-lead btn-delete"
-                                                    data-lead-id="<?php echo esc_attr($lead['id']); ?>">
-                                                    <span class="dashicons dashicons-trash"
-                                                        style="font-size: 16px; width: 16px; height: 16px; line-height: 16px;"></span> Xóa
                                                 </button>
                                             </td>
                                         </tr>
