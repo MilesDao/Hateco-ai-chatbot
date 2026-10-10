@@ -415,6 +415,8 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
                     Giao diện</a>
                 <a href="?page=ai-chatbot&tab=kb"
                     class="ai_chatbot-tab-link <?php echo 'kb' === $active_tab ? 'active' : ''; ?>">Tài liệu</a>
+                <a href="?page=ai-chatbot&tab=leads"
+                    class="ai_chatbot-tab-link <?php echo 'leads' === $active_tab ? 'active' : ''; ?>">Khách hàng (Leads)</a>
             </div>
 
             <?php if ('settings' === $active_tab): ?>
@@ -663,6 +665,56 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
                         </table>
                     </div>
                 </div>
+            <?php elseif ('leads' === $active_tab): ?>
+                <div class="ai_chatbot-card">
+                    <h3 style="margin-top: 0; color: #0f172a; font-size: 18px;">Khách hàng để lại thông tin tư vấn</h3>
+                    <div style="overflow-x: auto; margin-top: 15px;">
+                        <table class="ai_chatbot-table" id="ai_chatbot-leads-table">
+                            <thead>
+                                <tr>
+                                    <th>Họ và tên</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Lớp hiện tại</th>
+                                    <th>Ngành quan tâm</th>
+                                    <th>Nhu cầu tuyển sinh</th>
+                                    <th>Ghi chú</th>
+                                    <th>Thời gian ghi nhận</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                global $wpdb;
+                                $table_leads = $wpdb->prefix . 'ai_chatbot_leads';
+                                // ponytail: newest 500 only, add pagination when staff need older leads
+                                $leads = $wpdb->get_results("SELECT * FROM $table_leads ORDER BY id DESC LIMIT 500", ARRAY_A);
+
+                                if (empty($leads)): ?>
+                                    <tr class="no-leads-row">
+                                        <td colspan="8" style="text-align: center; color: #94a3b8; padding: 30px;">Chưa có khách hàng nào đăng ký thông tin tư vấn.</td>
+                                    </tr>
+                                <?php else:
+                                    foreach ($leads as $lead): ?>
+                                        <tr>
+                                            <td style="font-weight: 500;"><?php echo esc_html($lead['name'] !== '' ? $lead['name'] : '(chưa rõ)'); ?></td>
+                                            <td><a href="tel:<?php echo esc_attr($lead['phone']); ?>"><?php echo esc_html($lead['phone']); ?></a></td>
+                                            <td><?php echo esc_html($lead['grade']); ?></td>
+                                            <td><?php echo esc_html($lead['major']); ?></td>
+                                            <td><?php echo esc_html($lead['need']); ?></td>
+                                            <td style="color: #64748b; font-size: 13px;"><?php echo esc_html($lead['note']); ?></td>
+                                            <td style="color: #64748b; font-size: 13px;"><?php echo esc_html(date('d-m-Y H:i', strtotime($lead['created_at']))); ?></td>
+                                            <td>
+                                                <button class="btn-delete btn-delete-lead" data-lead-id="<?php echo esc_attr($lead['id']); ?>">
+                                                    <span class="dashicons dashicons-trash" style="font-size: 16px; width: 16px; height: 16px; line-height: 16px;"></span> Xóa
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach;
+                                endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             <?php endif; ?>
         </div>
 
@@ -840,7 +892,7 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
                                 $(this).remove();
                                 if ($('#ai_chatbot-leads-table tbody tr').length === 0) {
                                     $('#ai_chatbot-leads-table tbody').html(
-                                        '<tr class="no-leads-row"><td colspan="5" style="text-align: center; color: #94a3b8; padding: 30px;">Chưa có khách hàng nào đăng ký thông tin tư vấn.</td></tr>'
+                                        '<tr class="no-leads-row"><td colspan="8" style="text-align: center; color: #94a3b8; padding: 30px;">Chưa có khách hàng nào đăng ký thông tin tư vấn.</td></tr>'
                                     );
                                 }
                             });
