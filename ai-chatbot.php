@@ -294,96 +294,50 @@ class AI_Chatbot_Chatbot
             }
         }
 
+        $chat_model = get_option('ai_chatbot_openrouter_model');
+        if (empty($chat_model))
+            $chat_model = 'google/gemini-2.5-flash';
+        $embed_model = get_option('ai_chatbot_openrouter_embed_model');
+        if (empty($embed_model))
+            $embed_model = 'qwen/qwen3-embedding-8b';
+        $client = new OpenRouter_API_Client($api_key, $chat_model, $embed_model);
+
         // ==========================================
         // PHASE 9.5: Automated Conversational Lead Capture
         // ==========================================
+        $lead = AI_Chatbot_Lead_Flow::get_lead($session_id);
+        $phone_hit = AI_Chatbot_Lead_Flow::detect_phone($message);
         $is_lead_capture = false;
-        $captured_name = '';
-        $captured_phone = '';
-        $phone_regex = '/(?:(?:\+|00)84|0)(?:3|5|7|8|9)\d{8}\b/';
-        if (preg_match($phone_regex, $message, $matches)) {
-            $is_lead_capture = true;
-            $captured_phone = $matches[0];
 
-            // 1. Remove phone number and any associated phone labels (e.g., "số điện thoại là", "sđt của mình là")
-            $phone_escaped = preg_quote($captured_phone, '/');
-            $phone_label_regex = '/(?:(?:[,\-\s:;]\s*)|^)(?:(?:s[\s\.\-_]*đ[\s\.\-_]*t|s[\s\.\-_]*d[\s\.\-_]*t|số\s*(?:đ|điện)?\s*(?:t|thoại)?|liên\s*hệ|cung\s*cấp)(?:\s+(?:của|qua|tại)?\s*(?:mình|em|anh|chị|tớ|bạn)?)?\s*(?:là|:|—|-|\s)*)*' . $phone_escaped . '(?:(?:\s+(?:ạ|nhá|nhé|nha|ah|đấy|nhỉ|nhắc)(?:\s+(?:ạ|ad|admin|anh|chị|em|bạn))?)+|(?=[,\-\.\s:;]|$))/iu';
-            $clean_msg = preg_replace($phone_label_regex, ' ', $message);
-            $clean_msg = str_replace($captured_phone, ' ', $clean_msg);
+        // Extract only when a phone arrives, or when a short reply may carry the name an earlier capture missed.
+        $may_fill_name = $lead && $lead['name'] === '' && mb_strlen($message, 'UTF-8') <= 60;
+        if ($session_id !== '' && ($phone_hit || $may_fill_name)) {
+            $raw = $client->generate_chat_answer(
+                AI_Chatbot_Lead_Flow::build_transcript($history, $message),
+                AI_Chatbot_Lead_Flow::EXTRACTION_PROMPT
+            );
+            $extracted = AI_Chatbot_Lead_Flow::parse_extraction(is_wp_error($raw) ? '' : $raw);
 
-            // 2. Trim common leading polite words and symbols (Dạ, Vâng, Thưa, ạ, ơi, -, ,, :, ...)
-            $leading_polite_regex = '/^\s*(?:dạ|vâng|thưa|xin\s+cháo|xin\s+chào|ơi|à|ờ|ừ|ạ|nhé|nha|nhá|[,\-:;—_\.\/]+)+\s*/iu';
-            while (preg_match($leading_polite_regex, $clean_msg)) {
-                $clean_msg = preg_replace($leading_polite_regex, '', $clean_msg);
-            }
-
-            // 3. Trim common trailing conversational particles & symbols
-            $trailing_polite_regex = '/\s+(?:nhé\s*(?:ạ|ad|admin|anh|chị|em|bạn)?|nha\s*(?:ạ|ad|admin|anh|chị|em|bạn)?|nhá\s*(?:ạ|ad|admin|anh|chị|em|bạn)?|nhỉ|đây\s+ạ|nhé|nha|nhá|ạ|ah|a|nhở|với\s+ạ|với|luôn\s+nhé|luôn)[,\-\s:;—_\.\!]*$/iu';
-            while (preg_match($trailing_polite_regex, $clean_msg)) {
-                $clean_msg = preg_replace($trailing_polite_regex, '', $clean_msg);
-            }
-
-            // Trim lingering symbols at start and end
-            $clean_msg = preg_replace('/^[,\-:;—_\.\/\s]+|[,\-:;—_\.\/\s]+$/u', '', $clean_msg);
-
-            // 4. Check if what remains starts with an introduction pattern (mình tên là, em là, tên là, tên, họ tên...)
-            $intro_regex = '/^(?:(?:tên\s+)?(?:của\s+)?(?:mình|em|tớ|anh|chị|bạn|học\s*sinh)(?:\s+tên)?\s*(?:là|:|\s)|(?:mình|em|tớ|anh|chị|bạn)\s+tên\s*(?:là|:)?|tên\s*(?:của\s*)?(?:mình|em|tớ|anh|chị|bạn)?\s*(?:là|:|\s)|họ\s*(?:và)?\s*tên\s*(?:là|:)?|là\s+)\s*/iu';
-            $clean_msg = preg_replace($intro_regex, '', $clean_msg, 1);
-
-            // One last pass to remove any residual trailing particles from the extracted name itself
-            while (preg_match($trailing_polite_regex, $clean_msg)) {
-                $clean_msg = preg_replace($trailing_polite_regex, '', $clean_msg);
-            }
-
-            $clean_msg = trim(preg_replace('/\s+/u', ' ', $clean_msg));
-            $clean_msg = preg_replace('/^[,\-:;—_\.\/\s]+|[,\-:;—_\.\/\s]+$/u', '', $clean_msg);
-
-            $captured_name = (!empty($clean_msg) && mb_strlen($clean_msg, 'UTF-8') >= 2) ? $clean_msg : 'Học sinh (Qua Chat)';
-
-            // Determine question context from recent conversation history
-            $context_note = 'Quan tâm chung (Để lại SĐT trong trò chuyện)';
-            if (!empty($history)) {
-                $reversed_history = array_reverse($history);
-                foreach ($reversed_history as $h_msg) {
-                    if ($h_msg['role'] === 'user' && strpos($h_msg['content'], $captured_phone) === false) {
-                        $context_note = 'Quan tâm: ' . mb_substr($h_msg['content'], 0, 120, 'UTF-8');
-                        break;
-                    }
+            if ($phone_hit) {
+                $extracted['phone'] = $phone_hit['phone'];
+                if ($extracted['name'] === '') {
+                    $extracted['name'] = AI_Chatbot_Lead_Flow::fallback_name($message, $phone_hit['raw']);
                 }
             }
 
-            global $wpdb;
-            $table_leads_capture = $wpdb->prefix . 'ai_chatbot_leads';
-            $wpdb->insert(
-                $table_leads_capture,
-                array(
-                    'name' => $captured_name,
-                    'email' => 'Chưa cung cấp (Từ Chat)',
-                    'phone' => $captured_phone,
-                    'note' => $context_note
-                ),
-                array('%s', '%s', '%s', '%s')
-            );
-
-            // Update conversation lead name and trigger webhook
-            if (!empty($session_id)) {
-                $table_conversations = $wpdb->prefix . 'ai_chatbot_conversations';
-                $wpdb->update(
-                    $table_conversations,
-                    array('lead_name' => $captured_name . ' - ' . $captured_phone),
-                    array('session_id' => $session_id),
-                    array('%s'),
-                    array('%s')
-                );
-
-                $this->send_to_google_sheets_webhook('LEAD', $session_id, array('lead_name' => $captured_name . ' - ' . $captured_phone));
+            $merged = AI_Chatbot_Lead_Flow::merge_lead($lead ? $lead : array(), $extracted);
+            // Loose != on purpose: ignores key order and "5" vs 5 between DB row and merged array.
+            if ($merged['phone'] !== '' && $merged != $lead) {
+                $lead = AI_Chatbot_Lead_Flow::save_lead($session_id, $merged);
+                $this->send_to_google_sheets_webhook('LEAD', $session_id, AI_Chatbot_Lead_Flow::webhook_data($lead));
             }
+            $is_lead_capture = (bool) $phone_hit;
         }
 
         // ==========================================
         // PHASE 10: Cache Check
         // ==========================================
-        $cache_key = 'ai_chat_' . md5(strtolower(trim($message)) . serialize($history));
+        $cache_key = 'ai_chat_' . md5(strtolower(trim($message)) . serialize($history) . ($lead ? 'lead' : ''));
         $cached_response = get_transient($cache_key);
         if (!$is_lead_capture && $cached_response !== false) {
             // Fake an SSE stream for the cached response
@@ -424,13 +378,6 @@ class AI_Chatbot_Chatbot
         }
 
         // 1. Reformulate Query (Contextual Retrieval)
-        $chat_model = get_option('ai_chatbot_openrouter_model');
-        if (empty($chat_model))
-            $chat_model = 'google/gemini-2.5-flash';
-        $embed_model = get_option('ai_chatbot_openrouter_embed_model');
-        if (empty($embed_model))
-            $embed_model = 'qwen/qwen3-embedding-8b';
-        $client = new OpenRouter_API_Client($api_key, $chat_model, $embed_model);
 
         $search_query = $message;
         $enable_reformulate = get_option('ai_chatbot_enable_reformulate', '0');
@@ -496,10 +443,10 @@ QUY TẮC BẮT BUỘC:
             $system_prompt .= "\n\n[KHO TRI THỨC]\n" . $chunks_text . "\n[/KHO TRI THỨC]";
         }
 
-        $context_text = $system_prompt;
+        $context_text = $system_prompt . AI_Chatbot_Lead_Flow::flow_rules($lead);
 
-        if ($is_lead_capture) {
-            $context_text .= "\n\n[HỆ THỐNG GHI NHẬN THÔNG TIN LIÊN HỆ BẮT BUỘC]: Người dùng vừa cung cấp Số điện thoại ($captured_phone) và Tên ($captured_name). Hệ thống đã tự động lưu thành công thông tin vào Danh sách Quản lý của nhà trường. Hãy cảm ơn bạn học sinh một cách niềm nở, xác nhận rằng Phòng Đào tạo Trường Cao đẳng Kinh tế Công nghệ Hà Nội (Hateco) sẽ sớm liên hệ trực tiếp qua số điện thoại trên để hỗ trợ tư vấn chi tiết, và hỏi xem bạn có thắc mắc gì thêm trong thời gian chờ đợi không.";
+        if ($is_lead_capture && $lead) {
+            $context_text .= AI_Chatbot_Lead_Flow::capture_note($lead);
         }
 
         // History is now handled above
@@ -520,7 +467,8 @@ QUY TẮC BẮT BUỘC:
 
             wp_send_json_success(array(
                 'answer' => is_wp_error($answer) ? $answer->get_error_message() : $answer,
-                'contexts' => $raw_contexts
+                'contexts' => $raw_contexts,
+                'lead' => $lead
             ));
             exit;
         }
