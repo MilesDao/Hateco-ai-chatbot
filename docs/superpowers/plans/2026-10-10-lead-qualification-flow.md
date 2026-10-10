@@ -763,7 +763,7 @@ check(bool(lead) and '12' in lead['grade'] and 'Kế toán' in lead['major'], "C
 check('0912345678' in ans.replace(' ', '').replace('.', ''), "C: confirmation repeats the phone")
 ans, lead2 = turn(b, "Học phí ngành này một năm bao nhiêu ạ?")
 check(not ASK_PHONE.search(ans), "C: no re-ask after capture")
-check(bool(lead2) and lead2['id'] == lead['id'], "C: same lead row")
+check(bool(lead2) and str(lead2['id']) == str(lead['id']), "C: same lead row")  # DB row id is a string, save_lead id is an int
 
 # D: clear need, user declines -> bot stops asking
 d = str(uuid.uuid4())
