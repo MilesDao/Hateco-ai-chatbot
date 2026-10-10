@@ -62,29 +62,31 @@ function leadFields(data) {
   };
 }
 
+// Sheets stores the leading ' as a "literal text" marker: keeps leading zeros, blocks formulas.
+function asText(v) { return typeof v === 'string' && v !== '' ? "'" + v : v; }
+
 function upsertLead(sheet, sessionId, data, now) {
   var f = leadFields(data);
-  // Leading ' keeps the phone as text so the leading 0 is not dropped.
-  var fresh = [f.name, f.phone ? "'" + f.phone : '', f.grade, f.major, f.need, f.history];
+  var fresh = [f.name, f.phone, f.grade, f.major, f.need, f.history];
   var values = sheet.getDataRange().getValues();
 
   for (var i = 1; i < values.length; i++) {
     if (sessionId && values[i][2] === sessionId) {
       var old = values[i].slice(3, 9);
       var merged = fresh.map(function (v, k) { return v !== '' ? v : old[k]; });
-      sheet.getRange(i + 1, 2, 1, 8).setValues([[now, sessionId].concat(merged)]);
+      sheet.getRange(i + 1, 2, 1, 8).setValues([[now, asText(sessionId)].concat(merged.map(asText))]);
       return 'updated';
     }
   }
 
-  sheet.appendRow([now, now, sessionId].concat(fresh, [STATUS_OPTIONS[0], '', '']));
+  sheet.appendRow([now, now, asText(sessionId)].concat(fresh.map(asText), [STATUS_OPTIONS[0], '', '']));
   return 'inserted';
 }
 
 function messageRow(sessionId, data, now) {
   var sender = data.role === 'user' ? 'Khách hàng' : (data.chat_type === 'human' ? 'Nhân viên' : 'Chatbot');
   var text = String(data.content || '').replace(/<[^>]+>/g, '').trim().slice(0, MAX_CELL);
-  return [now, sessionId, data.lead_name || '', sender, data.chat_type || 'ai', text];
+  return [now, asText(sessionId), asText(data.lead_name || ''), sender, data.chat_type || 'ai', asText(text)];
 }
 
 function getSheet(ss, name, headers) {
