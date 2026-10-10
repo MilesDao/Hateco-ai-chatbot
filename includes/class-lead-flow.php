@@ -118,4 +118,33 @@ Chỉ dùng thông tin trong các dòng "Người dùng:". Không suy đoán.';
         $clean_msg = preg_replace('/^[,\-:;—_\.\/\s]+|[,\-:;—_\.\/\s]+$/u', '', $clean_msg);
         return mb_strlen($clean_msg, 'UTF-8') >= 2 ? $clean_msg : '';
     }
+
+    public static function flow_rules($lead)
+    {
+        if ($lead) {
+            return "\n\nTHÔNG TIN LIÊN HỆ:\n6. Hệ thống ĐÃ ghi nhận số điện thoại của người dùng này, tổ tư vấn tuyển sinh sẽ gọi lại. TUYỆT ĐỐI KHÔNG xin lại số điện thoại hay họ tên. Với câu hỏi không có trong [KHO TRI THỨC], trả lời: \"Dạ, phần này thầy cô tư vấn sẽ giải đáp chi tiết khi gọi cho bạn nhé.\" (thay cho quy tắc 5).";
+        }
+
+        return "\n\nQUY TRÌNH TƯ VẤN & THU THẬP THÔNG TIN:
+6. Luôn trả lời đầy đủ câu hỏi của người dùng TRƯỚC, sau đó mới tính đến việc xin thông tin.
+7. Tự đánh giá nhu cầu của người dùng qua toàn bộ cuộc trò chuyện:
+   - TÌM HIỂU CHUNG (hỏi chung về trường, danh sách ngành, chưa nói rõ mong muốn của bản thân): tiếp tục tư vấn bình thường, KHÔNG xin số điện thoại.
+   - CÓ NHU CẦU RÕ RÀNG (muốn đăng ký/xét tuyển/nộp hồ sơ; hỏi học phí, thủ tục hoặc hạn nộp của một ngành cụ thể; cho biết đang học lớp 12 hoặc đã tốt nghiệp và hỏi về nhập học; phụ huynh hỏi cho con một ngành cụ thể; muốn được gọi tư vấn hoặc gặp tư vấn viên): sau khi trả lời, mời khéo léo để lại HỌ TÊN và SỐ ĐIỆN THOẠI để thầy cô tổ tư vấn tuyển sinh gọi điện tư vấn kỹ hơn và hỗ trợ hồ sơ.
+8. Lời mời chỉ 1 câu ngắn, tự nhiên, nêu lợi ích. Nếu người dùng từ chối hoặc lờ đi lời mời, KHÔNG nhắc lại ở các lượt sau, trừ khi họ thể hiện nhu cầu rõ ràng hơn trước.
+9. Nếu người dùng muốn nói chuyện với người thật, mời họ để lại họ tên và số điện thoại để tư vấn viên gọi lại.";
+    }
+
+    public static function capture_note($lead)
+    {
+        if ($lead['name'] === '') {
+            $extra = 'hỏi xin họ tên để thầy cô tiện xưng hô khi gọi';
+        } elseif ($lead['grade'] === '' || $lead['major'] === '') {
+            $extra = 'hỏi nhẹ nhàng bạn đang học lớp mấy và quan tâm ngành nào (chỉ hỏi phần chưa biết) để thầy cô chuẩn bị tư vấn';
+        } else {
+            $extra = 'không hỏi thêm thông tin cá nhân';
+        }
+        $who = $lead['name'] !== '' ? ' của bạn ' . $lead['name'] : '';
+
+        return "\n\n[HỆ THỐNG ĐÃ LƯU THÔNG TIN LIÊN HỆ{$who}: số điện thoại {$lead['phone']}]. Nếu tin nhắn có kèm câu hỏi thì trả lời câu hỏi đó trước. Sau đó: (1) cảm ơn chân thành, (2) xác nhận đã ghi nhận thông tin và thầy cô tổ tư vấn tuyển sinh Trường Cao đẳng Kinh tế Công nghệ Hà Nội (Hateco) sẽ sớm gọi điện qua số {$lead['phone']}, (3) {$extra}, (4) hỏi bạn còn thắc mắc gì không.";
+    }
 }

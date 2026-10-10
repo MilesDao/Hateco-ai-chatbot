@@ -59,4 +59,20 @@ check($F::build_transcript(array(), 'hi') === 'Người dùng: hi', 'transcript 
 check($F::fallback_name('Mình tên là Trung, số điện thoại là 0985282393', '0985282393') === 'Trung', 'fallback name');
 check($F::fallback_name('0985282393', '0985282393') === '', 'fallback name empty');
 
+// flow_rules
+$r = $F::flow_rules(null);
+check(strpos($r, 'TÌM HIỂU CHUNG') !== false && strpos($r, 'CÓ NHU CẦU RÕ RÀNG') !== false, 'rules describe both intents');
+check(strpos($r, 'SỐ ĐIỆN THOẠI') !== false, 'rules invite phone when no lead');
+check(strpos($r, 'KHÔNG nhắc lại') !== false, 'rules forbid nagging after a decline');
+$r = $F::flow_rules(array('name' => 'Lan', 'phone' => '0912345678'));
+check(strpos($r, 'KHÔNG xin lại') !== false && strpos($r, 'CÓ NHU CẦU RÕ RÀNG') === false, 'lead present: never re-ask');
+
+// capture_note
+$n = $F::capture_note(array('name' => '', 'phone' => '0912345678', 'grade' => '', 'major' => '', 'need' => ''));
+check(strpos($n, '0912345678') !== false && strpos($n, 'họ tên') !== false, 'asks for name when missing');
+$n = $F::capture_note(array('name' => 'Lan', 'phone' => '0912345678', 'grade' => '', 'major' => '', 'need' => ''));
+check(strpos($n, 'Lan') !== false && strpos($n, 'họ tên') === false && strpos($n, 'lớp mấy') !== false, 'name known: asks grade/major instead');
+$n = $F::capture_note(array('name' => 'Lan', 'phone' => '0912345678', 'grade' => 'Lớp 12', 'major' => 'Kế toán', 'need' => ''));
+check(strpos($n, 'lớp mấy') === false, 'all known: asks nothing extra');
+
 echo "ALL PASSED\n";
