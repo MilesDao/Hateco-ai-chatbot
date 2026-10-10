@@ -147,4 +147,66 @@ Chỉ dùng thông tin trong các dòng "Người dùng:". Không suy đoán.';
 
         return "\n\n[HỆ THỐNG ĐÃ LƯU THÔNG TIN LIÊN HỆ{$who}: số điện thoại {$lead['phone']}]. Nếu tin nhắn có kèm câu hỏi thì trả lời câu hỏi đó trước. Sau đó: (1) cảm ơn chân thành, (2) xác nhận đã ghi nhận thông tin và thầy cô tổ tư vấn tuyển sinh Trường Cao đẳng Kinh tế Công nghệ Hà Nội (Hateco) sẽ sớm gọi điện qua số {$lead['phone']}, (3) {$extra}, (4) hỏi bạn còn thắc mắc gì không.";
     }
+
+    public static function get_lead($session_id)
+    {
+        if ($session_id === '') {
+            return null;
+        }
+        global $wpdb;
+        $row = $wpdb->get_row($wpdb->prepare(
+            "SELECT id, name, phone, grade, major, need FROM {$wpdb->prefix}ai_chatbot_leads WHERE session_id = %s ORDER BY id DESC LIMIT 1",
+            $session_id
+        ), ARRAY_A);
+        return $row ? $row : null;
+    }
+
+    public static function save_lead($session_id, $lead)
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'ai_chatbot_leads';
+        $row = array(
+            'session_id' => $session_id,
+            'name' => $lead['name'],
+            'phone' => $lead['phone'],
+            'grade' => $lead['grade'],
+            'major' => $lead['major'],
+            'need' => $lead['need'],
+        );
+
+        if (!empty($lead['id'])) {
+            $id = (int) $lead['id'];
+            $wpdb->update($table, $row, array('id' => $id));
+        } else {
+            $row['email'] = 'Chưa cung cấp (Từ Chat)';
+            $wpdb->insert($table, $row);
+            $id = (int) $wpdb->insert_id;
+        }
+
+        $wpdb->update(
+            $wpdb->prefix . 'ai_chatbot_conversations',
+            array('lead_id' => $id, 'lead_name' => self::label($lead)),
+            array('session_id' => $session_id)
+        );
+
+        $lead['id'] = $id;
+        return $lead;
+    }
+
+    public static function webhook_data($lead)
+    {
+        return array(
+            'lead_name' => self::label($lead), // kept for the existing Apps Script
+            'name' => $lead['name'],
+            'phone' => $lead['phone'],
+            'grade' => $lead['grade'],
+            'major' => $lead['major'],
+            'need' => $lead['need'],
+        );
+    }
+
+    private static function label($lead)
+    {
+        return ($lead['name'] !== '' ? $lead['name'] : 'Học sinh (Qua Chat)') . ' - ' . $lead['phone'];
+    }
 }

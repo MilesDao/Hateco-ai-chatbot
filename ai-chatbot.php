@@ -3,7 +3,7 @@
  * Plugin Name: Hateco AI Chatbot
  * Plugin URI: https://github.com/google-deepmind/ai-chatbot
  * Description: A self-contained Hateco AI Chatbot with Retrieval-Augmented Generation (RAG) powered by the Gemini API. Index local files in WordPress MySQL and query them in real-time using a beautiful glassmorphic floating widget.
- * Version: 2.2.0
+ * Version: 2.3.0
  * Author: Dao Trung
  * Text Domain: ai-chatbot
  * Requires at least: 5.8
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 // Define Constants
 define('AI_CHATBOT_PATH', plugin_dir_path(__FILE__));
 define('AI_CHATBOT_URL', plugin_dir_url(__FILE__));
-define('AI_CHATBOT_VERSION', '2.2.0');
+define('AI_CHATBOT_VERSION', '2.3.0');
 
 /**
  * Custom activation routine to create database tables for documents and chunks.
@@ -76,12 +76,17 @@ function ai_chatbot_activate()
     $table_leads = $wpdb->prefix . 'ai_chatbot_leads';
     $sql_leads = "CREATE TABLE $table_leads (
         id bigint(20) NOT NULL AUTO_INCREMENT,
+        session_id varchar(64) DEFAULT '',
         name varchar(255) NOT NULL,
         email varchar(255) DEFAULT '',
         phone varchar(50) NOT NULL,
+        grade varchar(100) DEFAULT '',
+        major varchar(255) DEFAULT '',
+        need varchar(255) DEFAULT '',
         note text DEFAULT NULL,
         created_at datetime DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY  (id)
+        PRIMARY KEY  (id),
+        KEY session_id (session_id)
     ) $charset_collate;";
     dbDelta($sql_leads);
 
@@ -131,6 +136,7 @@ register_activation_hook(__FILE__, 'ai_chatbot_activate');
 require_once AI_CHATBOT_PATH . 'includes/class-openrouter-client.php';
 require_once AI_CHATBOT_PATH . 'includes/class-rag-manager.php';
 require_once AI_CHATBOT_PATH . 'includes/class-admin-settings.php';
+require_once AI_CHATBOT_PATH . 'includes/class-lead-flow.php';
 
 /**
  * Primary Plugin Bootstrap Class
