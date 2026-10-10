@@ -75,4 +75,7 @@ check(strpos($n, 'Lan') !== false && strpos($n, 'họ tên') === false && strpos
 $n = $F::capture_note(array('name' => 'Lan', 'phone' => '0912345678', 'grade' => 'Lớp 12', 'major' => 'Kế toán', 'need' => ''));
 check(strpos($n, 'lớp mấy') === false, 'all known: asks nothing extra');
 
+check($F::fallback_name('em muốn đăng ký ngành kế toán, sđt 0985282393', '0985282393') === '', 'fallback rejects long sentence');
+check($F::fallback_name('học phí ngành CNTT bao nhiêu ạ? 0912345678', '0912345678') === '', 'fallback rejects question');
+
 echo "ALL PASSED\n";

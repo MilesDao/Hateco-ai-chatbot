@@ -86,7 +86,7 @@ function upsertLead(sheet, sessionId, data, now) {
 function messageRow(sessionId, data, now) {
   var sender = data.role === 'user' ? 'Khách hàng' : (data.chat_type === 'human' ? 'Nhân viên' : 'Chatbot');
   var text = String(data.content || '').replace(/<[^>]+>/g, '').trim().slice(0, MAX_CELL);
-  return [now, asText(sessionId), asText(data.lead_name || ''), sender, data.chat_type || 'ai', asText(text)];
+  return [now, asText(sessionId), asText(data.lead_name || ''), sender, asText(data.chat_type || 'ai'), asText(text)];
 }
 
 function getSheet(ss, name, headers) {

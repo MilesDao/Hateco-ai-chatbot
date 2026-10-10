@@ -309,8 +309,12 @@ class AI_Chatbot_Chatbot
         $phone_hit = AI_Chatbot_Lead_Flow::detect_phone($message);
         $is_lead_capture = false;
 
-        // Extract only when a phone arrives, or when a short reply may carry the name an earlier capture missed.
-        $may_fill_name = $lead && $lead['name'] === '' && mb_strlen($message, 'UTF-8') <= 60;
+        // Extract only when a phone arrives, or once (one-shot flag set at capture) for the short reply to our name question.
+        $ask_name_key = 'ai_lead_ask_name_' . md5($session_id);
+        $may_fill_name = !$phone_hit && $lead && $lead['name'] === '' && mb_strlen($message, 'UTF-8') <= 60 && get_transient($ask_name_key);
+        if ($may_fill_name) {
+            delete_transient($ask_name_key);
+        }
         if ($session_id !== '' && ($phone_hit || $may_fill_name)) {
             $raw = $client->generate_chat_answer(
                 AI_Chatbot_Lead_Flow::build_transcript($history, $message),
@@ -320,9 +324,11 @@ class AI_Chatbot_Chatbot
 
             if ($phone_hit) {
                 $extracted['phone'] = $phone_hit['phone'];
-                if ($extracted['name'] === '') {
+                if ($extracted['name'] === '' && is_wp_error($raw)) {
                     $extracted['name'] = AI_Chatbot_Lead_Flow::fallback_name($message, $phone_hit['raw']);
                 }
+            } else {
+                $extracted = array('name' => $extracted['name']); // name-fill turn: save the name only
             }
 
             $merged = AI_Chatbot_Lead_Flow::merge_lead($lead ? $lead : array(), $extracted);
@@ -330,6 +336,9 @@ class AI_Chatbot_Chatbot
             if ($merged['phone'] !== '' && $merged != $lead) {
                 $lead = AI_Chatbot_Lead_Flow::save_lead($session_id, $merged);
                 $this->send_to_google_sheets_webhook('LEAD', $session_id, AI_Chatbot_Lead_Flow::webhook_data($lead));
+            }
+            if ($phone_hit && $lead && $lead['name'] === '') {
+                set_transient($ask_name_key, 1, HOUR_IN_SECONDS);
             }
             $is_lead_capture = (bool) $phone_hit;
         }
@@ -545,6 +554,9 @@ QUY TẮC BẮT BUỘC:
         $content = isset($_POST['content']) ? wp_kses_post(wp_unslash($_POST['content'])) : '';
         $lead_name = isset($_POST['lead_name']) ? sanitize_text_field(wp_unslash($_POST['lead_name'])) : '';
         $chat_type = isset($_POST['chat_type']) ? sanitize_text_field(wp_unslash($_POST['chat_type'])) : 'ai';
+        if (!in_array($chat_type, array('ai', 'human'), true)) {
+            $chat_type = 'ai';
+        }
 
         if (empty($session_id) || empty($role) || empty($content)) {
             wp_send_json_error(array('message' => 'Missing required fields.'));

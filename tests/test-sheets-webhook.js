@@ -79,7 +79,8 @@ console.log('ok - history truncated');
 
 // messageRow
 assert.deepStrictEqual(Array.from(ctx.messageRow('s1', { role: 'bot', content: '<p>Chào <b>bạn</b></p>', chat_type: 'ai', lead_name: 'Lan - 0912345678' }, t1)),
-  [t1, "'s1", "'Lan - 0912345678", 'Chatbot', 'ai', "'Chào bạn"]);
+  [t1, "'s1", "'Lan - 0912345678", 'Chatbot', "'ai", "'Chào bạn"]);
+assert.strictEqual(ctx.messageRow('s1', { role: 'user', content: 'hi', chat_type: '=1+1' }, t1)[4], "'=1+1");
 assert.strictEqual(ctx.messageRow('s1', { role: 'user', content: '=1+1', chat_type: 'ai' }, t1)[5], "'=1+1");
 assert.strictEqual(ctx.messageRow('s1', { role: 'user', content: 'hi', chat_type: 'ai' }, t1)[3], 'Khách hàng');
 assert.strictEqual(ctx.messageRow('s1', { role: 'bot', content: 'hi', chat_type: 'human' }, t1)[3], 'Nhân viên');

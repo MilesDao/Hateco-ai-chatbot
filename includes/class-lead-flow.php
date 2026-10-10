@@ -116,13 +116,16 @@ Chỉ dùng thông tin trong các dòng "Người dùng:". Không suy đoán.';
 
         $clean_msg = trim(preg_replace('/\s+/u', ' ', $clean_msg));
         $clean_msg = preg_replace('/^[,\-:;—_\.\/\s]+|[,\-:;—_\.\/\s]+$/u', '', $clean_msg);
+        if (strpos($clean_msg, '?') !== false || count(preg_split('/\s+/u', $clean_msg)) > 4) {
+            return '';
+        }
         return mb_strlen($clean_msg, 'UTF-8') >= 2 ? $clean_msg : '';
     }
 
     public static function flow_rules($lead)
     {
         if ($lead) {
-            return "\n\nTHÔNG TIN LIÊN HỆ:\n6. Hệ thống ĐÃ ghi nhận số điện thoại của người dùng này, tổ tư vấn tuyển sinh sẽ gọi lại. TUYỆT ĐỐI KHÔNG xin lại số điện thoại hay họ tên. Với câu hỏi không có trong [KHO TRI THỨC], trả lời: \"Dạ, phần này thầy cô tư vấn sẽ giải đáp chi tiết khi gọi cho bạn nhé.\" (thay cho quy tắc 5).";
+            return "\n\nTHÔNG TIN LIÊN HỆ:\n6. Hệ thống ĐÃ ghi nhận số điện thoại của người dùng này, tổ tư vấn tuyển sinh sẽ gọi lại. TUYỆT ĐỐI KHÔNG xin lại số điện thoại; chỉ hỏi họ tên khi hệ thống yêu cầu bên dưới. Với câu hỏi không có trong [KHO TRI THỨC], trả lời: \"Dạ, phần này thầy cô tư vấn sẽ giải đáp chi tiết khi gọi cho bạn nhé.\" (thay cho quy tắc 5).";
         }
 
         return "\n\nQUY TRÌNH TƯ VẤN & THU THẬP THÔNG TIN:
