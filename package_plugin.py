@@ -3,7 +3,7 @@ import zipfile
 
 def create_plugin_zip(source_dir, output_filename):
     # Directories and files to exclude from the zip
-    exclude_dirs = {'.venv', 'eval', '.git', '.codegraph', '.vscode', '__pycache__'}
+    exclude_dirs = {'.venv', 'eval', '.git', '.codegraph', '.vscode', '__pycache__', 'tests', 'docs'}
     exclude_files = {'.gitignore', os.path.basename(output_filename)}
 
     print(f"Creating {output_filename}...")
