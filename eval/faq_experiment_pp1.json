@@ -1,0 +1,242 @@
+[
+ {
+  "path": "FAQ",
+  "answer": "Để thuận tiện hơn cho các em, nhà trường đang xét tuyển theo hình thức online.\nHồ sơ gồm có:\n1. Ảnh chụp CCCD 2 mặt\n2. Ảnh chụp học bạ trung học phổ thông.\n3. Số điện thoại\n4. Ngành đăng ký học\n5. Địa chỉ cụ thể nơi em đang ở để nhà trường gửi giấy báo nhập học.",
+  "verdict": "dung",
+  "reason": "Câu trả lời của AI trùng khớp hoàn toàn với đáp án chuẩn."
+ },
+ {
+  "path": "RAG",
+  "answer": "Em cần chuẩn bị hồ sơ đăng ký xét tuyển theo trình độ mà em muốn học. Cụ thể:\n\n- Đối với trình độ trung cấp, cao đẳng, hồ sơ gồm: 01 phiếu đăng ký tuyển sinh; 01 bản chính giấy chứng nhận kết quả thi tốt nghiệp THPT quốc gia; 01 bản photo công chứng học bạ THPT hoặc tương đương; 01 bản photo công chứng bằng tốt nghiệp hoặc giấy chứng nhận tốt nghiệp THPT; 01 giấy chứng nhận ưu tiên (nếu có); 01 bản photo công chứng CCCD hoặc bản CCCD trên hệ thống VNeID; 01 bản photo công chứng giấy khai sinh; 02 ảnh 4x6; 02 phong bì có dán tem, ghi rõ địa chỉ và số điện thoại liên hệ.\n- Lưu ý: thí sinh xét tuyển trình độ trung cấp nếu chưa tốt nghiệp THPT thì nộp bản sao học bạ THCS và bản sao bằng tốt nghiệp hoặc giấy chứng nhận tốt nghiệp THCS tạm thời.\n\nEm có thể nộp hồ sơ theo 3 cách: nộp trực tiếp hoặc gửi qua bưu điện về Phòng Truyền thông - Tuyển sinh, Trường Cao đẳng Kinh tế Công nghệ Hà Nội, cơ sở Hà Nội: 202 Hồ Tùng Mậu, phường Phú Diễn, thành phố Hà Nội; đăng ký online tại website Hateco.edu.vn; hoặc liên hệ các số điện thoại tư vấn của nhà trường tại Hà Nội: 0853 292 255 hoặc 0867 848 868.\n\nEm đang quan tâm đến ngành nào để nhà trường hỗ trợ thêm thông tin nh",
+  "verdict": "sai",
+  "reason": "Câu trả lời của AI đưa ra danh sách hồ sơ khác hoàn toàn và không nêu đúng các mục trong đáp án chuẩn (ảnh CCCD, ảnh học bạ, số điện thoại, ngành đăng ký, địa chỉ), đồng thời thêm nhiều thông tin không có trong đáp án chuẩn."
+ },
+ {
+  "path": "RAG",
+  "answer": "Em có thể đăng ký xét tuyển online tại website Hateco.edu.vn, hoặc nộp trực tiếp/gửi qua bưu điện về Phòng Truyền thông - Tuyển sinh, Trường Cao đẳng Kinh tế Công nghệ Hà Nội, cơ sở Hà Nội: 202 Hồ Tùng Mậu, phường Phú Diễn, thành phố Hà Nội. Ngoài ra, em cũng có thể liên hệ số điện thoại tư vấn của nhà trường tại Hà Nội: 0853 292 255 hoặc 0867 848 868 để được hỗ trợ.\n\nHồ sơ đăng ký xét tuyển trình độ cao đẳng, trung cấp bao gồm:\n- 01 phiếu đăng ký tuyển sinh (Phụ lục 02)\n- 01 bản chính giấy chứng nhận kết quả thi tốt nghiệp THPT quốc gia\n- 01 bản photo công chứng học bạ THPT hoặc tương đương\n- 01 bản photo công chứng bằng tốt nghiệp hoặc giấy chứng nhận tốt nghiệp THPT\n- 01 giấy chứng nhận ưu tiên (nếu có)\n- 01 bản photo công chứng CCCD hoặc bản CCCD trên hệ thống VNeID\n- 01 bản photo công chứng giấy khai sinh\n- 02 ảnh 4x6; 02 phong bì có dán tem, ghi rõ địa chỉ và số điện thoại liên hệ\n\nEm đang quan tâm đến ngành nào? Nếu cần, em có thể để lại tên và số điện thoại để thầy cô tư vấn tuyển sinh gọi điện hỗ trợ kỹ hơn nhé.",
+  "verdict": "mot_phan",
+  "reason": "AI cung cấp thông tin chi tiết về địa điểm và hồ sơ nhưng không nêu đúng các mục chính của đáp án chuẩn (ảnh CCCD, ảnh học bạ, số điện thoại, ngành đăng ký, địa chỉ) và thêm nhiều giấy tờ không có trong đáp án chuẩn."
+ },
+ {
+  "path": "RAG",
+  "answer": "Thủ tục đăng ký xét tuyển vào trường rất đơn giản em nhé. Nhà trường tuyển sinh liên tục trong năm theo hình thức xét tuyển, em có thể thực hiện theo một trong ba cách sau:\n- Cách 1: Nộp hồ sơ trực tiếp hoặc gửi qua bưu điện về Phòng Truyền thông - Tuyển sinh, Trường Cao đẳng Kinh tế Công nghệ Hà Nội, cơ sở Hà Nội: 202 Hồ Tùng Mậu, phường Phú Diễn, thành phố Hà Nội.\n- Cách 2: Đăng ký online tại website Hateco.edu.vn.\n- Cách 3: Liên hệ các số điện thoại tư vấn của nhà trường tại Hà Nội: 0853 292 255 hoặc 0867 848 868.\n\nHồ sơ đăng ký xét tuyển trình độ cao đẳng và trung cấp bao gồm:\n- 01 phiếu đăng ký tuyển sinh (Phụ lục 02)\n- 01 bản chính giấy chứng nhận kết quả thi tốt nghiệp THPT quốc gia\n- 01 bản photo công chứng học bạ THPT hoặc tương đương\n- 01 bản photo công chứng bằng tốt nghiệp hoặc giấy chứng nhận tốt nghiệp THPT\n- 01 giấy chứng nhận ưu tiên (nếu có)\n- 01 bản photo công chứng CCCD hoặc bản CCCD trên hệ thống VNeID\n- 01 bản photo công chứng giấy khai sinh\n- 02 ảnh 4x6; 02 phong bì có dán tem, ghi rõ địa chỉ và số điện thoại liên hệ\n\nEm đang quan tâm đến ngành học nào của trường vậy?",
+  "verdict": "mot_phan",
+  "reason": "AI nêu đúng hình thức xét tuyển online và một số giấy tờ như CCCD, học bạ, nhưng thiếu các ý quan trọng như số điện thoại, ngành đăng ký, địa chỉ cụ thể để gửi giấy báo nhập học, đồng thời thêm nhiều thông tin không có trong đáp án chuẩn."
+ },
+ {
+  "path": "FAQ",
+  "answer": "HATECO hiện đang đào tạo 14 ngành hot, phù hợp với nhu cầu phát triển hiện đại. Danh sách 14 ngành bao gồm:\n1.Chăn nuôi Thú y;\n2.Kỹ thuật chế biến món ăn;\n3.Công nghệ ô tô;\n4.Công nghệ thông tin (Ứng dụng phần mềm);\n5.Kế toán doanh nghiệp;\n6.Lắp đặt thiết bị cơ khí;\n7.Quản trị doanh nghiệp vừa và nhỏ;\n8.Thương mại điện tử;\n9.Tiếng Anh;\n10.Tiếng Hàn Quốc;\n11.Tiếng Nhật\n12.Trồng cây ăn quả;\n13.Marketing\n14.Quản trị khách sạn;",
+  "verdict": "dung",
+  "reason": "Câu trả lời của AI trùng khớp hoàn toàn với đáp án chuẩn về danh sách 14 ngành đào tạo."
+ },
+ {
+  "path": "FAQ",
+  "answer": "HATECO hiện đang đào tạo 14 ngành hot, phù hợp với nhu cầu phát triển hiện đại. Danh sách 14 ngành bao gồm:\n1.Chăn nuôi Thú y;\n2.Kỹ thuật chế biến món ăn;\n3.Công nghệ ô tô;\n4.Công nghệ thông tin (Ứng dụng phần mềm);\n5.Kế toán doanh nghiệp;\n6.Lắp đặt thiết bị cơ khí;\n7.Quản trị doanh nghiệp vừa và nhỏ;\n8.Thương mại điện tử;\n9.Tiếng Anh;\n10.Tiếng Hàn Quốc;\n11.Tiếng Nhật\n12.Trồng cây ăn quả;\n13.Marketing\n14.Quản trị khách sạn;",
+  "verdict": "dung",
+  "reason": "Câu trả lời của AI trùng khớp hoàn toàn với đáp án chuẩn về nội dung và danh sách 14 ngành."
+ },
+ {
+  "path": "RAG",
+  "answer": "Nhà trường đang tuyển sinh 14 ngành, nghề đào tạo với cả trình độ Cao đẳng và Trung cấp. Em tham khảo danh sách dưới đây nhé:\n\n- Công nghệ ô tô: Cao đẳng (mã 6510216, 35 chỉ tiêu), Trung cấp (mã 5510216, 35 chỉ tiêu) - học tại trụ sở chính 202 Hồ Tùng Mậu.\n- Chăn nuôi - Thú y: Cao đẳng (mã 6620120, 35 chỉ tiêu) - học tại trụ sở chính 202 Hồ Tùng Mậu.\n- Tiếng Anh: Cao đẳng (mã 6220206, 20 chỉ tiêu), Trung cấp (mã 5220206, 60 chỉ tiêu) - học tại Văn Trì, Tây Tựu.\n- Tiếng Hàn Quốc: Cao đẳng (mã 6220211, 20 chỉ tiêu), Trung cấp (mã 5220211, 60 chỉ tiêu) - học tại Văn Trì, Tây Tựu.\n- Tiếng Nhật: Cao đẳng (mã 6220212, 20 chỉ tiêu), Trung cấp (mã 5220212, 90 chỉ tiêu) - học tại Văn Trì, Tây Tựu.\n- Marketing: Cao đẳng (mã 6340116, 30 chỉ tiêu), Trung cấp (mã 5340116, 30 chỉ tiêu).\n- Thương mại điện tử: Cao đẳng (mã 6340122, 30 chỉ tiêu), Trung cấp (mã 5340122, 30 chỉ tiêu).\n- Kế toán doanh nghiệp: Cao đẳng (mã 6340302, 90 chỉ tiêu), Trung cấp (mã 5340302, 90 chỉ tiêu).\n- Quản trị doanh nghiệp vừa và nhỏ: Cao đẳng (mã 6340417, 90 chỉ ti",
+  "verdict": "mot_phan",
+  "reason": "AI nêu đủ 14 ngành nhưng thiếu 4 ngành (Lắp đặt thiết bị cơ khí, Trồng cây ăn quả, Quản trị khách sạn, Kỹ thuật chế biến món ăn) và thêm thông tin chi tiết không có trong đáp án chuẩn."
+ },
+ {
+  "path": "RAG",
+  "answer": "Nhà trường đang tuyển sinh các ngành nghề sau (theo Giấy chứng nhận đăng ký hoạt động giáo dục nghề nghiệp số 43/2026/GCNĐKHĐ-GDNNGDTX):\n\n- Nhóm Công nghệ kỹ thuật cơ khí: Công nghệ ô tô (Cao đẳng, mã 6510216, 35 chỉ tiêu; Trung cấp, mã 5510216, 35 chỉ tiêu).\n- Nhóm Nông nghiệp: Chăn nuôi - Thú y (Cao đẳng, mã 6620120, 35 chỉ tiêu).\n- Nhóm Ngôn ngữ, văn học và văn hóa nước ngoài: Tiếng Anh (Cao đẳng, mã 6220206, 20 chỉ tiêu; Trung cấp, mã 5220206, 60 chỉ tiêu); Tiếng Hàn Quốc (Cao đẳng, mã 6220211, 20 chỉ tiêu; Trung cấp, mã 5220211, 60 chỉ tiêu); Tiếng Nhật (Cao đẳng, mã 6220212, 20 chỉ tiêu; Trung cấp, mã 5220212, 90 chỉ tiêu).\n- Nhóm Kinh doanh: Marketing (Cao đẳng, mã 6340116, 30 chỉ tiêu; Trung cấp, mã 5340116, 30 chỉ tiêu); Thương mại điện tử (Cao đẳng, mã 6340122, 30 chỉ tiêu; Trung cấp, mã 5340122, 30 chỉ tiêu).\n- Nhóm Kế toán - Kiểm toán: Kế toán doanh nghiệp (Cao đẳng, mã 6340302, 90 chỉ tiêu; Trung cấp, mã 5340302, 90 chỉ tiêu).\n- Nhóm Quản trị - Quản lý: Quản trị doanh nghiệp vừa và nhỏ (Cao đẳng, mã 6340417, 90 chỉ tiêu; Trung cấp, mã 5340417",
+  "verdict": "mot_phan",
+  "reason": "AI chỉ nêu được 8 trong 14 ngành của đáp án chuẩn, thiếu các ngành như Kỹ thuật chế biến món ăn, Lắp đặt thiết bị cơ khí, Trồng cây ăn quả, Quản trị khách sạn, và kèm thêm thông tin chi tiết về mã ngành, chỉ tiêu không có trong đáp án chuẩn."
+ },
+ {
+  "path": "FAQ",
+  "answer": "Trường Cao đẳng Kinh tế Hà Nội có địa chỉ trụ sở chính ở 202 Hồ Tùng Mậu, phường Phú Diễn, Hà Nội. Văn phòng tuyển sinh ở Số 2 Lê Đức Thọ, Từ Liêm, Hà Nội.",
+  "verdict": "dung",
+  "reason": "AI trả lời trùng khớp hoàn toàn với đáp án chuẩn."
+ },
+ {
+  "path": "RAG",
+  "answer": "Trường Cao đẳng Kinh tế Công nghệ Hà Nội (HATECO) có trụ sở chính tại số 202 đường Hồ Tùng Mậu, phường Phú Diễn, thành phố Hà Nội. Ngoài đó, các ngành ngôn ngữ (Tiếng Anh, Tiếng Hàn Quốc, Tiếng Nhật) được đào tạo tại địa điểm Văn Trì, Tây Tựu. Em đang quan tâm đến ngành nào?",
+  "verdict": "mot_phan",
+  "reason": "AI nêu đúng trụ sở chính 202 Hồ Tùng Mậu nhưng gọi sai tên trường thành 'Cao đẳng Kinh tế Công nghệ Hà Nội' thay vì 'Cao đẳng Kinh tế Hà Nội', đồng thời thêm thông tin về địa điểm Văn Trì không có trong đáp án chuẩn và thiếu văn phòng tuyển sinh ở Số 2 Lê Đức Thọ."
+ },
+ {
+  "path": "RAG",
+  "answer": "Em có thể đến trực tiếp trường tại địa chỉ: Số 202 đường Hồ Tùng Mậu, phường Phú Diễn, thành phố Hà Nội. Nhà trường luôn sẵn sàng đón tiếp và tư vấn trực tiếp cho em trong giờ hành chính em nhé. Em đang quan tâm đến ngành nào để nhà trường hỗ trợ thêm thông tin?",
+  "verdict": "mot_phan",
+  "reason": "AI chỉ nêu địa chỉ trụ sở chính mà thiếu địa chỉ văn phòng tuyển sinh ở Số 2 Lê Đức Thọ như đáp án chuẩn."
+ },
+ {
+  "path": "RAG",
+  "answer": "Văn phòng tuyển sinh của trường đặt tại Phòng Truyền thông - Tuyển sinh, Trường Cao đẳng Kinh tế Công nghệ Hà Nội, cơ sở Hà Nội: 202 Hồ Tùng Mậu, phường Phú Diễn, thành phố Hà Nội. Em có thể nộp hồ sơ trực tiếp hoặc gửi qua bưu điện về địa chỉ này, hoặc đăng ký online tại website Hateco.edu.vn, hoặc liên hệ số điện thoại 0853 292 255 hoặc 0867 848 868 để được hỗ trợ em nhé.",
+  "verdict": "sai",
+  "reason": "AI đưa ra địa chỉ văn phòng tuyển sinh là 202 Hồ Tùng Mậu (trụ sở chính), trong khi đáp án chuẩn ghi rõ văn phòng tuyển sinh ở Số 2 Lê Đức Thọ, Từ Liêm, Hà Nội."
+ },
+ {
+  "path": "FAQ",
+  "answer": "Năm 2026, các ngành này đang được áp dụng giảm 70% học phí theo quy định của nhà nước:\n- Chăn nuôi Thú y\n- Kỹ thuật chế biến món ăn\n- Công nghệ ô tô\n- Trồng cây ăn quả\n- Lắp đặt thiết bị cơ khí",
+  "verdict": "dung",
+  "reason": "AI trả lời trùng khớp hoàn toàn với đáp án chuẩn, không thiếu hay thừa thông tin."
+ },
+ {
+  "path": "FAQ",
+  "answer": "Năm 2026, các ngành này đang được áp dụng giảm 70% học phí theo quy định của nhà nước:\n- Chăn nuôi Thú y\n- Kỹ thuật chế biến món ăn\n- Công nghệ ô tô\n- Trồng cây ăn quả\n- Lắp đặt thiết bị cơ khí",
+  "verdict": "dung",
+  "reason": "Câu trả lời của AI trùng khớp hoàn toàn với đáp án chuẩn về danh sách các ngành được giảm 70% học phí năm 2026."
+ },
+ {
+  "path": "FAQ",
+  "answer": "Năm 2026, các ngành này đang được áp dụng giảm 70% học phí theo quy định của nhà nước:\n- Chăn nuôi Thú y\n- Kỹ thuật chế biến món ăn\n- Công nghệ ô tô\n- Trồng cây ăn quả\n- Lắp đặt thiết bị cơ khí",
+  "verdict": "dung",
+  "reason": "Câu trả lời của AI trùng khớp hoàn toàn với đáp án chuẩn về danh sách các ngành được giảm 70% học phí."
+ },
+ {
+  "path": "RAG",
+  "answer": "Trường có chính sách ưu tiên xét tuyển và miễn, giảm chế độ chính sách xã hội cho các đối tượng theo quy định. Cụ thể, các em thuộc nhóm ưu tiên theo đối tượng (như con thương binh, bệnh binh, người có công với cách mạng...) hoặc theo khu vực sẽ được xem xét hưởng ưu tiên. Ngoài ra, nhà trường cũng có học bổng dành cho tân sinh viên nhập học theo các tiêu chí như đăng ký sớm, thành tích học tập tốt, hoặc hoàn cảnh đặc biệt khó khăn.\n\nEm đang quan tâm đến ngành Chăn nuôi - Thú y của trường đúng không ạ?",
+  "verdict": "sai",
+  "reason": "AI trả lời về chính sách ưu tiên và học bổng, không đáp đề giảm 70% học phí theo đáp án chuẩn."
+ },
+ {
+  "path": "FAQ",
+  "answer": "Trường có chương trình đào tạo từ xa cho cho các đối tượng đã đi làm, rất linh hoạt và chủ động thời gian.",
+  "verdict": "dung",
+  "reason": "Câu trả lời của AI trùng khớp hoàn toàn với đáp án chuẩn."
+ },
+ {
+  "path": "RAG",
+  "answer": "Nhà trường tuyển sinh theo hình thức xét tuyển, thời gian tuyển sinh liên tục trong năm. Về hình thức đào tạo online, hiện tại trong quy chế tuyển sinh năm 2026 của trường chưa có thông tin chính thức về việc đào tạo từ xa hay online. Em có thể tham khảo thêm các ngành học tại trường để chọn được hình thức phù hợp nhé.",
+  "verdict": "sai",
+  "reason": "AI nói trường chưa có thông tin chính thức về đào tạo online, trong khi đáp án chuẩn khẳng định trường có chương trình đào tạo từ xa."
+ },
+ {
+  "path": "RAG",
+  "answer": "Hoàn toàn được em nhé. Nhà trường có đào tạo hệ vừa học vừa làm, tạo điều kiện cho những người đã đi làm vẫn có thể theo học. Tuy nhiên, về chương trình đào tạo từ xa cụ thể, nhà trường chưa có thông tin chính thức. Em có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?",
+  "verdict": "mot_phan",
+  "reason": "AI xác nhận có hệ vừa học vừa làm cho người đã đi làm nhưng lại nói chưa có thông tin về chương trình từ xa, trong khi đáp án chuẩn khẳng định có chương trình đào tạo từ xa."
+ },
+ {
+  "path": "RAG",
+  "answer": "Nhà trường chưa có thông tin chính thức về chương trình đào tạo từ xa trong tài liệu tuyển sinh năm 2026. Em có thể tham khảo các hình thức đào tạo chính quy tại trường như cao đẳng, trung cấp, trung học nghề (hệ 9+) và liên kết quốc tế. Em đang quan tâm đến ngành học nào để được tư vấn kỹ hơn không?",
+  "verdict": "sai",
+  "reason": "AI nói trường chưa có thông tin về chương trình từ xa, trong khi đáp án chuẩn khẳng định có chương trình đào tạo từ xa."
+ },
+ {
+  "path": "FAQ",
+  "answer": "Hiện tại, học từ xa trường có đào tạo những ngành sau đây:\n- Chăn nuôi Thú y\n- Công nghệ ô tô\n- Kỹ thuật chế biến món ăn\n- Kế toán doanh nghiệp\n- Công nghệ thông tin (Úng dụng phần mềm)\n- Tiếng Nhật\n- Ngôn ngữ Hàn\n- Quản trị doanh nghiệp vừa và nhỏ",
+  "verdict": "dung",
+  "reason": "AI liệt kê đầy đủ và chính xác các ngành giống hệt đáp án chuẩn."
+ },
+ {
+  "path": "FAQ",
+  "answer": "Hiện tại, học từ xa trường có đào tạo những ngành sau đây:\n- Chăn nuôi Thú y\n- Công nghệ ô tô\n- Kỹ thuật chế biến món ăn\n- Kế toán doanh nghiệp\n- Công nghệ thông tin (Úng dụng phần mềm)\n- Tiếng Nhật\n- Ngôn ngữ Hàn\n- Quản trị doanh nghiệp vừa và nhỏ",
+  "verdict": "dung",
+  "reason": "Câu trả lời của AI trùng khớp hoàn toàn với đáp án chuẩn về danh sách các ngành học từ xa."
+ },
+ {
+  "path": "RAG",
+  "answer": "Nhà trường chưa có thông tin chính thức về việc đào tạo từ xa cho ngành Kế toán. Em đang quan tâm đến ngành Kế toán doanh nghiệp của trường mình đúng không ạ?",
+  "verdict": "sai",
+  "reason": "AI nói chưa có thông tin trong khi đáp án chuẩn xác nhận có đào tạo từ xa ngành Kế toán doanh nghiệp."
+ },
+ {
+  "path": "FAQ",
+  "answer": "Trường có chương trình đào tạo từ xa cho cho các đối tượng đã đi làm, rất linh hoạt và chủ động thời gian.",
+  "verdict": "sai",
+  "reason": "AI không nêu bất kỳ ngành nào trong danh sách đáp án chuẩn, chỉ mô tả chung chung về chương trình."
+ },
+ {
+  "path": "FAQ",
+  "answer": "Sinh viên chủ yếu học qua các học liệu (giáo trình, video, ứng dụng đa phương tiện trên các thiết bị điện tử, các phương tiện nghe nhìn, các tổ hợp truyền thông đa phương tiện, mạng internet,…) dưới sự tổ chức, trợ giúp của giảng viên và đội ngũ cán bộ của nhà trường.",
+  "verdict": "dung",
+  "reason": "Câu trả lời của AI trùng khớp hoàn toàn với đáp án chuẩn."
+ },
+ {
+  "path": "RAG",
+  "answer": "Nhà trường hiện tại chưa có thông tin chính thức về chương trình đào tạo từ xa. Em có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?",
+  "verdict": "sai",
+  "reason": "AI không trả lời câu hỏi mà nói chưa có thông tin, trong khi đáp án chuẩn đã nêu rõ cách học từ xa."
+ },
+ {
+  "path": "RAG",
+  "answer": "Nhà trường hiện tại chưa có thông tin chính thức về hệ từ xa. Em có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?",
+  "verdict": "sai",
+  "reason": "AI không trả lời câu hỏi mà nói chưa có thông tin, trong khi đáp án chuẩn đã nêu rõ cách học của hệ từ xa."
+ },
+ {
+  "path": "RAG",
+  "answer": "Nhà trường hiện chưa có thông tin chính thức về hình thức đào tạo từ xa. Em có thể tham khảo các ngành nghề đào tạo chính quy tại trường để lựa chọn phù hợp. Em đang quan tâm đến ngành nào?",
+  "verdict": "sai",
+  "reason": "AI không trả lời câu hỏi mà nói chưa có thông tin, trong khi đáp án chuẩn đã nêu rõ sinh viên học qua các học liệu và phương tiện truyền thông."
+ },
+ {
+  "path": "FAQ",
+  "answer": "Nhà trường hiện đang xét tuyển đối với các đối tượng tốt nghiệp THCS, THPT hoặc tương đương, hoặc có bằng trung cấp, cao đẳng, đại học.",
+  "verdict": "dung",
+  "reason": "Câu trả lời của AI giống hệt đáp án chuẩn, nêu đầy đủ các đối tượng và phương thức xét tuyển."
+ },
+ {
+  "path": "RAG",
+  "answer": "Tốt nghiệp lớp 9 có xét tuyển vào trình độ trung học nghề (hệ 9+) em nhé. Điều kiện xét tuyển là tốt nghiệp trung học cơ sở (THCS) và tương đương trở lên, phương thức xét tuyển là xét tốt nghiệp THCS.\n\nEm đang quan tâm đến ngành nào?",
+  "verdict": "dung",
+  "reason": "AI nêu đúng đối tượng tốt nghiệp THCS được xét tuyển, phù hợp với đáp án chuẩn, chỉ thêm chi tiết cụ thể về hệ 9+ nhưng không mâu thuẫn."
+ },
+ {
+  "path": "RAG",
+  "answer": "Điều kiện xét tuyển vào trường được chia theo từng trình độ đào tạo, cụ thể như sau:\n\n- Trình độ cao đẳng: Người có bằng tốt nghiệp THPT; hoặc người có bằng tốt nghiệp trung cấp và có giấy chứng nhận hoàn thành chương trình giáo dục phổ thông, hoặc giấy chứng nhận đủ yêu cầu khối lượng kiến thức văn hóa THPT, hoặc đã học và thi đạt yêu cầu đủ khối lượng kiến thức văn hóa THPT theo quy định.\n- Trình độ trung cấp: Học sinh đã tốt nghiệp THPT và tương đương trở lên.\n- Trình độ trung học nghề (hệ 9+): Học sinh đã tốt nghiệp THCS, học song song văn hóa THPT và kỹ năng nghề.\n- Trình độ sơ cấp: Người từ đủ 15 tuổi trở lên, có trình độ học vấn và sức khỏe phù hợp với nghề cần học.\n- Đào tạo thường xuyên (dưới 3 tháng): Người từ đủ 15 tuổi trở lên, có trình độ học vấn và sức khỏe phù hợp với nghề cần học.\n\nNgoài ra, thí sinh cần đáp ứng điều kiện chung là có sức khỏe để học tập, năng lực phù hợp với ngành, nghề cần học và không trong thời gian bị truy tố hoặc thi hành án hình sự. Với trình độ cao đẳng và trung cấp, ngưỡng đảm bảo chất lượng đầu vào là điểm xét tuyển từ 16,5 điểm trở lên.\n\nEm đang quan tâm đến ngành nào để nhà trường tư vấn kỹ hơn nhé?",
+  "verdict": "mot_phan",
+  "reason": "AI nêu chi tiết hơn đáp án chuẩn nhưng thiếu ý 'tốt nghiệp THCS, THPT hoặc tương đương' cho tất cả các đối tượng, đồng thời thêm thông tin về điểm xét tuyển và điều kiện sức khỏe không có trong đáp án chuẩn."
+ },
+ {
+  "path": "RAG",
+  "answer": "Hoàn toàn được em nhé. Nhà trường luôn chào đón các anh chị đã tốt nghiệp đại học có nhu cầu học tiếp để nâng cao kỹ năng nghề nghiệp. Việc xét tuyển sẽ dựa trên kết quả học tập và hồ sơ của em, cụ thể nhà trường có các hệ đào tạo phù hợp như cao đẳng, trung cấp.\n\nEm đang quan tâm đến ngành nghề cụ thể nào để nhà trường tư vấn chi tiết hơn không?",
+  "verdict": "dung",
+  "reason": "AI xác nhận được học tiếp và nêu đúng đối tượng có bằng đại học được xét tuyển, phù hợp với đáp án chuẩn."
+ },
+ {
+  "path": "FAQ",
+  "answer": "Thời gian đào tạo: Căn cứ vào bằng cấp, trình độ đầu vào của người học:\n+ Hệ trung cấp: Thời gian từ 1-2 năm;\n+ Hệ cao đẳng: Thời gian từ 1,5 – 3 năm;",
+  "verdict": "dung",
+  "reason": "AI trả lời trùng khớp hoàn toàn với đáp án chuẩn."
+ },
+ {
+  "path": "RAG",
+  "answer": "Học cao đẳng tại trường thường kéo dài từ 2 đến 3 năm tùy theo ngành nghề cụ thể. Em đang quan tâm đến ngành học nào để nhà trường tư vấn chính xác hơn không?",
+  "verdict": "mot_phan",
+  "reason": "AI nêu thời gian 2-3 năm, nhưng đáp án chuẩn ghi rõ hệ cao đẳng là 1,5-3 năm, thiếu mốc 1,5 năm."
+ },
+ {
+  "path": "RAG",
+  "answer": "Trung cấp tại nhà trường, theo quy chế tuyển sinh, là chương trình đào tạo nghề nghiệp. Thời gian học cụ thể chưa được nêu trong tài liệu mà nhà trường có. Phần này nhà trường chưa có thông tin chính thức. Em có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?",
+  "verdict": "sai",
+  "reason": "AI nói chưa có thông tin về thời gian học trong khi đáp án chuẩn đã nêu rõ thời gian đào tạo hệ trung cấp là 1-2 năm."
+ },
+ {
+  "path": "RAG",
+  "answer": "Chương trình đào tạo tại trường có thời gian khác nhau tùy theo trình độ và hệ đào tạo, em nhé. Cụ thể:\n- Trình độ cao đẳng: dành cho thí sinh đã tốt nghiệp THPT.\n- Trình độ trung cấp: dành cho thí sinh đã tốt nghiệp THPT hoặc THCS.\n- Trình độ trung học nghề (hệ 9+): dành cho học sinh tốt nghiệp THCS, học song song văn hóa THPT và kỹ năng nghề.\n- Trình độ sơ cấp và đào tạo thường xuyên (dưới 3 tháng): dành cho người từ đủ 15 tuổi trở lên.\n\nEm đang quan tâm đến hệ đào tạo hay ngành nghề cụ thể nào để nhà trường tư vấn chi tiết hơn không?",
+  "verdict": "mot_phan",
+  "reason": "AI nêu đúng các hệ đào tạo nhưng không đề cập đến thời gian cụ thể (1-2 năm cho trung cấp, 1,5-3 năm cho cao đẳng) như đáp án chuẩn."
+ },
+ {
+  "path": "FAQ",
+  "answer": "Hoàn toàn được em nhé. Sinh viên được liên thông lên các trường Cao đẳng, Đại học trong cả nước theo quy định.",
+  "verdict": "dung",
+  "reason": "Câu trả lời của AI trùng khớp hoàn toàn với đáp án chuẩn."
+ },
+ {
+  "path": "RAG",
+  "answer": "Học xong cao đẳng hoàn toàn có thể học liên thông lên đại học, và nhà trường có tuyển sinh liên thông từ trình độ trung cấp lên cao đẳng. Việc học lên đại học sau khi tốt nghiệp cao đẳng là hoàn toàn phù hợp với lộ trình học tập liên tục, em nhé.\n\nEm đang quan tâm đến ngành nào để nhà trường tư vấn kỹ hơn không?",
+  "verdict": "dung",
+  "reason": "AI trả lời đúng trọng tâm là học xong cao đẳng có thể liên thông lên đại học, không mâu thuẫn với đáp án chuẩn, dù có thêm thông tin về tuyển sinh trung cấp nhưng không sai."
+ },
+ {
+  "path": "RAG",
+  "answer": "Hoàn toàn được em nhé. Sau khi tốt nghiệp cao đẳng tại trường, em có thể học liên thông lên trình độ cao hơn. Cụ thể, theo quy chế tuyển sinh của nhà trường, em có thể đăng ký học liên thông từ trình độ trung cấp lên cao đẳng, và sau khi tốt nghiệp cao đẳng, em có thể tiếp tục học liên thông lên đại học theo quy định hiện hành. Điều kiện để xét tuyển liên thông từ trung cấp lên cao đẳng là em cần có bằng tốt nghiệp trung cấp và bằng tốt nghiệp THPT, hoặc các giấy tờ tương đương theo quy định.\n\nEm đang quan tâm đến ngành học nào để nhà trường tư vấn kỹ hơn không?",
+  "verdict": "dung",
+  "reason": "AI trả lời đúng trọng tâm là được liên thông, đồng thời bổ sung chi tiết về các bậc liên thông và điều kiện, không mâu thuẫn với đáp án chuẩn."
+ },
+ {
+  "path": "RAG",
+  "answer": "Em hỏi chính điểm chố, nhà trường hỗ trợ liên thông từ cao đẳng lên đại học em nhé. Theo quy chế tuyển sinh năm 2026, nhà trường có tuyển sinh liên thông từ trung cấp lên cao đẳng, và có hệ liên kết quốc tế trình độ cao đẳng, đại học nước ngoài. Điều kiện xét tuyển cho hệ liên kết là: có sức khỏe và năng lực phù hợp với ngành, nghề cần học; không trong thời gian bị truy tố hoặc thi hàng án hình sự; và đã tốt nghiệp THPT hoặc tương đương. Nếu em là người Việt Nam, yêu cầu có chứng chỉ quốc tế (IELTS 5.5 trở lên; TOEFL 72 trở lên hoặc tương đương), hoặc sẽ học dự bị. Em đang quan tâm đến ngành nào?",
+  "verdict": "mot_phan",
+  "reason": "AI xác nhận được việc liên thông lên đại học nhưng thêm nhiều chi tiết về hệ liên kết quốc tế và điều kiện không có trong đáp án chuẩn, thiếu ý chính là liên thông lên các trường cao đẳng, đại học trong cả nước."
+ }
+]

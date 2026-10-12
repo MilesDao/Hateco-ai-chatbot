@@ -3,7 +3,7 @@
  * Plugin Name: Hateco AI Chatbot
  * Plugin URI: https://github.com/google-deepmind/ai-chatbot
  * Description: A self-contained Hateco AI Chatbot with Retrieval-Augmented Generation (RAG) powered by the Gemini API. Index local files in WordPress MySQL and query them in real-time using a beautiful glassmorphic floating widget.
- * Version: 2.3.0
+ * Version: 2.4.0
  * Author: Dao Trung
  * Text Domain: ai-chatbot
  * Requires at least: 5.8
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 // Define Constants
 define('AI_CHATBOT_PATH', plugin_dir_path(__FILE__));
 define('AI_CHATBOT_URL', plugin_dir_url(__FILE__));
-define('AI_CHATBOT_VERSION', '2.3.0');
+define('AI_CHATBOT_VERSION', '2.4.0');
 
 /**
  * Custom activation routine to create database tables for documents and chunks.
@@ -127,6 +127,17 @@ function ai_chatbot_activate()
         KEY conversation_id (conversation_id)
     ) $charset_collate;";
     dbDelta($sql_messages);
+
+    // 6. Table for FAQs imported from Excel (answered before RAG)
+    $table_faqs = $wpdb->prefix . 'ai_chatbot_faqs';
+    $sql_faqs = "CREATE TABLE $table_faqs (
+        id bigint(20) NOT NULL AUTO_INCREMENT,
+        question text NOT NULL,
+        answer longtext NOT NULL,
+        created_at datetime DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY  (id)
+    ) $charset_collate;";
+    dbDelta($sql_faqs);
 }
 register_activation_hook(__FILE__, 'ai_chatbot_activate');
 
@@ -137,6 +148,7 @@ require_once AI_CHATBOT_PATH . 'includes/class-openrouter-client.php';
 require_once AI_CHATBOT_PATH . 'includes/class-rag-manager.php';
 require_once AI_CHATBOT_PATH . 'includes/class-admin-settings.php';
 require_once AI_CHATBOT_PATH . 'includes/class-lead-flow.php';
+require_once AI_CHATBOT_PATH . 'includes/class-faq.php';
 
 /**
  * Primary Plugin Bootstrap Class
@@ -296,7 +308,7 @@ class AI_Chatbot_Chatbot
 
         $chat_model = get_option('ai_chatbot_openrouter_model');
         if (empty($chat_model))
-            $chat_model = 'google/gemini-2.5-flash';
+            $chat_model = 'deepseek/deepseek-v4-flash-0731';
         $embed_model = get_option('ai_chatbot_openrouter_embed_model');
         if (empty($embed_model))
             $embed_model = 'qwen/qwen3-embedding-8b';
@@ -344,29 +356,25 @@ class AI_Chatbot_Chatbot
         }
 
         // ==========================================
+        // PHASE 9.8: FAQ lookup (imported from Excel) - answer verbatim, skip RAG/LLM
+        // ==========================================
+        if (!$is_lead_capture) {
+            $faq = AI_Chatbot_FAQ::find($message);
+            if ($faq) {
+                if (isset($_POST['eval_mode']) && '1' === $_POST['eval_mode']) {
+                    wp_send_json_success(array('answer' => $faq['answer'], 'contexts' => array($faq['question']), 'lead' => $lead, 'faq' => true));
+                }
+                $this->send_text_as_stream($faq['answer']);
+            }
+        }
+
+        // ==========================================
         // PHASE 10: Cache Check
         // ==========================================
         $cache_key = 'ai_chat_' . md5(strtolower(trim($message)) . serialize($history) . ($lead ? 'lead' : ''));
         $cached_response = get_transient($cache_key);
         if (!$is_lead_capture && $cached_response !== false) {
-            // Fake an SSE stream for the cached response
-            header('Content-Type: text/event-stream');
-            header('Cache-Control: no-cache');
-            header('Connection: keep-alive');
-
-            // Output as a single chunk
-            $data = array(
-                'choices' => array(
-                    array(
-                        'delta' => array(
-                            'content' => $cached_response
-                        )
-                    )
-                )
-            );
-            echo "data: " . wp_json_encode($data) . "\n\n";
-            echo "data: [DONE]\n\n";
-            exit;
+            $this->send_text_as_stream($cached_response);
         }
 
         // ==========================================
@@ -429,18 +437,22 @@ class AI_Chatbot_Chatbot
         }
 
         // Custom system prompt/persona from settings
-        $default_prompt = "Bạn là Trợ lý AI tư vấn tuyển sinh chính thức của trường Cao đẳng Kinh tế Công nghệ Hà Nội (Hateco) Hỗ trợ giải đáp thắc mắc, tư vấn chọn ngành, hướng dẫn thủ tục xét tuyển cho học sinh, phụ huynh quan tâm đến trường HATECO. Xưng \"mình\", gọi người dùng là \"bạn\".
+        $default_prompt = "Bạn là Trợ lý AI tư vấn tuyển sinh chính thức của trường Cao đẳng Kinh tế Công nghệ Hà Nội (Hateco). Hỗ trợ giải đáp thắc mắc, tư vấn chọn ngành, hướng dẫn thủ tục xét tuyển cho học sinh, phụ huynh quan tâm đến trường HATECO.
 
 [KHO TRI THỨC]
 {context}
 [/KHO TRI THỨC]
 
+PHONG CÁCH TRẢ LỜI (bắt buộc bám sát văn phong của các câu trả lời mẫu trong [KHO TRI THỨC]):
+1. Xưng \"nhà trường\" hoặc \"trường\" (không xưng \"mình\", \"tôi\", \"chúng tôi\"), gọi người dùng là \"em\" hoặc \"các em\". Dùng giọng thân mật, gần gũi của người tư vấn tuyển sinh, có thể kết câu bằng \"em nhé\" (ví dụ: \"Hoàn toàn được em nhé.\").
+2. Câu đầu tiên PHẢI là nội dung trả lời trực tiếp câu hỏi. TUYỆT ĐỐI KHÔNG mở đầu bằng lời chào, \"Dạ\", \"Chào em\", lời cảm ơn, lời khen câu hỏi, hay câu dẫn như \"Về vấn đề này...\", \"Dưới đây là...\"; không nhắc lại câu hỏi. Trả lời ngắn gọn, đúng trọng tâm. Chỉ chào lại khi người dùng chỉ chào mà chưa hỏi gì.
+3. Trình bày danh sách bằng gạch đầu dòng \"- \" ở đầu mỗi dòng; danh sách có thứ tự thì đánh số \"1.\", \"2.\"... Không dùng in đậm, tiêu đề hay bảng.
+4. Giữ nguyên tên ngành, số liệu, tên giấy tờ đúng như trong [KHO TRI THỨC].
+
 QUY TẮC BẮT BUỘC:
-1. Dựa vào [KHO TRI THỨC] để trả lời một cách thân thiện, nhiệt tình.
-2. Trình bày các danh sách (ví dụ: danh sách ngành học) bằng dấu cộng (+) rõ ràng ở đầu mỗi dòng.
-3. Có thể kết thúc câu trả lời bằng những câu hỏi gợi mở thân thiện như \"Bạn đang quan tâm đến ngành nào?\" hoặc \"Để mình tư vấn kỹ hơn cho bạn nhé.\"
-4. KHÔNG tự bịa đặt bất kỳ thông tin, số liệu, học phí, hay ngành học nào KHÔNG có trong tài liệu.
-5. Nếu thông tin HOÀN TOÀN KHÔNG CÓ trong [KHO TRI THỨC], mới trả lời đúng 1 câu: \"Dạ, phần này bên mình chưa có thông tin chính thức. Bạn có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?\"";
+5. Chỉ dựa vào [KHO TRI THỨC] để trả lời. KHÔNG tự bịa đặt bất kỳ thông tin, số liệu, học phí, hay ngành học nào KHÔNG có trong tài liệu.
+6. Có thể kết thúc bằng một câu hỏi gợi mở ngắn như \"Em đang quan tâm đến ngành nào?\".
+7. Nếu thông tin HOÀN TOÀN KHÔNG CÓ trong [KHO TRI THỨC], mới trả lời đúng 1 câu: \"Phần này nhà trường chưa có thông tin chính thức. Em có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?\"";
 
         // Force the new prompt by bypassing the database option which holds the old one
         $system_prompt = $default_prompt;
@@ -484,6 +496,23 @@ QUY TẮC BẮT BUỘC:
 
         // 4. Make OpenRouter API chat call with Streaming
         $client->generate_chat_answer_stream($message, $context_text, $history);
+    }
+
+    /**
+     * Replays a ready-made answer as a one-chunk SSE stream (same shape the OpenRouter stream produces) and exits.
+     */
+    private function send_text_as_stream($text)
+    {
+        header('Content-Type: text/event-stream');
+        header('Cache-Control: no-cache');
+        header('Connection: keep-alive');
+        echo "data: " . wp_json_encode(array('choices' => array(array('delta' => array('content' => $text))))) . "
+
+";
+        echo "data: [DONE]
+
+";
+        exit;
     }
 
     /**

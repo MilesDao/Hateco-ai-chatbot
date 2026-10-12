@@ -58,7 +58,7 @@ class AI_Chatbot_Manager
         // 3. Generate embeddings and save to database
         $chat_model = get_option('ai_chatbot_openrouter_model');
         if (empty($chat_model)) {
-            $chat_model = 'google/gemini-2.5-flash';
+            $chat_model = 'deepseek/deepseek-v4-flash-0731';
         }
         $embed_model = get_option('ai_chatbot_openrouter_embed_model');
         if (empty($embed_model)) {
@@ -428,7 +428,7 @@ class AI_Chatbot_Manager
         $dense_scores_map = array(); // preserve original dense scores
         $chat_model = get_option('ai_chatbot_openrouter_model');
         if (empty($chat_model))
-            $chat_model = 'google/gemini-2.5-flash';
+            $chat_model = 'deepseek/deepseek-v4-flash-0731';
         $embed_model = get_option('ai_chatbot_openrouter_embed_model');
         if (empty($embed_model))
             $embed_model = 'qwen/qwen3-embedding-8b';

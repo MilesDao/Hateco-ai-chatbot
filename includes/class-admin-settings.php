@@ -27,6 +27,9 @@ class AI_Chatbot_Admin_Settings
         // AJAX handler for viewing conversation messages
         add_action('wp_ajax_ai_chatbot_get_conversation_messages', array($this, 'handle_get_conversation_messages'));
         add_action('wp_ajax_ai_chatbot_check_waiting', array($this, 'handle_check_waiting'));
+
+        // FAQ Excel import (plain form post)
+        add_action('admin_post_ai_chatbot_import_faq', array($this, 'handle_faq_import'));
     }
 
     /**
@@ -100,7 +103,7 @@ class AI_Chatbot_Admin_Settings
         $api_key = $api_key_is_constant ? OPENROUTER_API_KEY : get_option('ai_chatbot_openrouter_api_key', '');
         $chat_model = get_option('ai_chatbot_openrouter_model');
         if (empty($chat_model))
-            $chat_model = 'google/gemini-2.5-flash';
+            $chat_model = 'deepseek/deepseek-v4-flash-0731';
 
         $embed_model = get_option('ai_chatbot_openrouter_embed_model');
         if (empty($embed_model))
@@ -415,6 +418,8 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
                     Giao diện</a>
                 <a href="?page=ai-chatbot&tab=kb"
                     class="ai_chatbot-tab-link <?php echo 'kb' === $active_tab ? 'active' : ''; ?>">Tài liệu</a>
+                <a href="?page=ai-chatbot&tab=faq"
+                    class="ai_chatbot-tab-link <?php echo 'faq' === $active_tab ? 'active' : ''; ?>">FAQ</a>
                 <a href="?page=ai-chatbot&tab=leads"
                     class="ai_chatbot-tab-link <?php echo 'leads' === $active_tab ? 'active' : ''; ?>">Khách hàng (Leads)</a>
             </div>
@@ -442,9 +447,9 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
                         <div class="ai_chatbot-form-group">
                             <label for="ai_chatbot_openrouter_model">Mô hình Chat (LLM)</label>
                             <input type="text" id="ai_chatbot_openrouter_model" name="ai_chatbot_openrouter_model"
-                                value="<?php echo esc_attr($chat_model); ?>" placeholder="google/gemini-2.5-flash">
+                                value="<?php echo esc_attr($chat_model); ?>" placeholder="deepseek/deepseek-v4-flash-0731">
                             <p class="description">Nhập OpenRouter Model ID dùng để tạo câu trả lời (VD:
-                                google/gemini-2.5-flash).</p>
+                                deepseek/deepseek-v4-flash-0731).</p>
                         </div>
 
                         <div class="ai_chatbot-form-group">
@@ -658,6 +663,61 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
                                                     dữ liệu
                                                 </button>
                                             </td>
+                                        </tr>
+                                    <?php endforeach;
+                                endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            <?php elseif ('faq' === $active_tab): ?>
+                <div class="ai_chatbot-card">
+                    <h2>Câu hỏi thường gặp (FAQ)</h2>
+                    <p style="color: #64748b; margin-bottom: 25px; max-width: 640px;">
+                        Chatbot tìm trong danh sách này <strong>trước</strong>. Nếu câu hỏi của khách khớp một câu hỏi FAQ, chatbot trả
+                        đúng nguyên văn câu trả lời tương ứng; nếu không khớp mới chuyển sang tra cứu tài liệu và AI.
+                    </p>
+
+                    <?php if (isset($_GET['faq_imported'])): ?>
+                        <div class="notice notice-success inline"><p>Đã nhập <?php echo intval($_GET['faq_imported']); ?> câu hỏi FAQ.</p></div>
+                    <?php elseif (isset($_GET['faq_error'])): ?>
+                        <div class="notice notice-error inline"><p><?php echo esc_html(wp_unslash($_GET['faq_error'])); ?></p></div>
+                    <?php endif; ?>
+
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" enctype="multipart/form-data">
+                        <input type="hidden" name="action" value="ai_chatbot_import_faq">
+                        <?php wp_nonce_field('ai_chatbot_import_faq'); ?>
+                        <input type="file" name="faq_file" accept=".xlsx,.csv" required>
+                        <button type="submit" class="button button-primary"
+                            onclick="return confirm('Nhập tệp mới sẽ THAY THẾ toàn bộ FAQ hiện có. Tiếp tục?');">Nhập từ Excel</button>
+                        <p class="description">Tệp .xlsx (hoặc .csv UTF-8): cột A = <strong>Câu hỏi</strong>, cột B =
+                            <strong>Câu trả lời</strong>, mỗi dòng một FAQ, dòng tiêu đề (nếu có) sẽ tự bỏ qua. Chỉ đọc trang tính
+                            đầu tiên. Tối đa 2MB.</p>
+                    </form>
+
+                    <?php
+                    global $wpdb;
+                    $faq_rows = $wpdb->get_results('SELECT question, answer FROM ' . AI_Chatbot_FAQ::table() . ' ORDER BY id ASC', ARRAY_A);
+                    ?>
+                    <h3 style="margin-top: 40px; color: #0f172a; font-size: 18px;">Danh sách FAQ hiện có (<?php echo count($faq_rows); ?>)</h3>
+                    <div style="overflow-x: auto; margin-top: 15px;">
+                        <table class="ai_chatbot-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 35%;">Câu hỏi</th>
+                                    <th>Câu trả lời</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($faq_rows)): ?>
+                                    <tr>
+                                        <td colspan="2" style="text-align: center; color: #94a3b8; padding: 30px;">Chưa có FAQ nào. Hãy nhập tệp Excel phía trên.</td>
+                                    </tr>
+                                <?php else:
+                                    foreach ($faq_rows as $faq_row): ?>
+                                        <tr>
+                                            <td style="font-weight: 500;"><?php echo esc_html($faq_row['question']); ?></td>
+                                            <td style="white-space: pre-line;"><?php echo esc_html($faq_row['answer']); ?></td>
                                         </tr>
                                     <?php endforeach;
                                 endif; ?>
@@ -1029,6 +1089,36 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
         $wpdb->delete($table_docs, array('id' => $doc_id), array('%d'));
 
         wp_send_json_success(array('message' => 'Xóa tài liệu và khối vector thành công.'));
+    }
+
+    /**
+     * Imports FAQs from an uploaded .xlsx/.csv (replaces all existing FAQs), then redirects back to the FAQ tab.
+     */
+    public function handle_faq_import()
+    {
+        check_admin_referer('ai_chatbot_import_faq');
+        if (!current_user_can('manage_options')) {
+            wp_die('Bạn không có quyền thực hiện hành động này.');
+        }
+
+        $back = admin_url('admin.php?page=ai-chatbot&tab=faq');
+        $file = isset($_FILES['faq_file']) ? $_FILES['faq_file'] : null;
+        $ext = $file ? strtolower(pathinfo($file['name'], PATHINFO_EXTENSION)) : '';
+
+        if (!$file || UPLOAD_ERR_OK !== $file['error']) {
+            $result = new WP_Error('faq_upload', 'Không tải được tệp lên.');
+        } elseif (!in_array($ext, array('xlsx', 'csv'), true)) {
+            $result = new WP_Error('faq_ext', 'Chỉ hỗ trợ tệp .xlsx hoặc .csv.');
+        } elseif ($file['size'] > 2 * 1024 * 1024) {
+            $result = new WP_Error('faq_size', 'Tệp vượt quá 2MB.');
+        } else {
+            $result = AI_Chatbot_FAQ::import($file['tmp_name'], $ext);
+        }
+
+        wp_safe_redirect(is_wp_error($result)
+            ? add_query_arg('faq_error', rawurlencode($result->get_error_message()), $back)
+            : add_query_arg('faq_imported', $result, $back));
+        exit;
     }
 
     /**

@@ -71,7 +71,7 @@ Upon activation, a new menu called **Hateco AI Chatbot** will appear in your Wor
 7. **AI Bot Persona / System Instructions**: Define the chatbot's behavior, tone of voice, or restrictions.
    * *Example*: `"You are a polite receptionist for ACME Corp. Answer questions concisely using only the text snippets."*
 8. **Advanced RAG Settings (Default values recommended)**:
-   - *Chat Model*: OpenRouter ID for chat generation (default: `google/gemini-2.5-flash`).
+   - *Chat Model*: OpenRouter ID for chat generation (default: `deepseek/deepseek-v4-flash-0731`).
    - *Embedding Model*: OpenRouter ID for vectorization (default: `qwen/qwen3-embedding-8b`).
    - *Reranker Model*: Cohere Reranker ID (default: `cohere/rerank-v3.5`).
    - *Context Chunk Count (Top K)*: The number of most relevant matching snippets retrieved (recommended: `20` or `25` to ensure maximum context coverage).
@@ -140,7 +140,7 @@ When a visitor types a question in the chat widget:
 2. The RAG Manager vectorizes the user's question using OpenRouter's embedding API.
 3. It performs a **high-speed Hybrid Search** by computing Cosine Similarity in Pinecone (Dense) and matching keywords in MySQL (Sparse).
 4. It extracts the top $K$ most similar text chunks, merges them using Reciprocal Rank Fusion (RRF), and optionally reranks them via Cohere.
-5. It packs these relevant chunks as context alongside your system prompt, sending them to your selected OpenRouter model (default: `google/gemini-2.5-flash`) for a highly specialized, context-aware reply.
+5. It packs these relevant chunks as context alongside your system prompt, sending them to your selected OpenRouter model (default: `deepseek/deepseek-v4-flash-0731`) for a highly specialized, context-aware reply.
 6. The frontend renders the result, formatting lists and bold text on the fly using a secure HTML markdown converter.
 
 ---

@@ -17,7 +17,7 @@ class OpenRouter_API_Client {
     private $chat_model;
     private $embed_model;
 
-    public function __construct( $api_key, $chat_model = 'openai/gpt-oss-120b:free', $embed_model = 'nvidia/llama-nemotron-embed-vl-1b-v2:free' ) {
+    public function __construct( $api_key, $chat_model = 'deepseek/deepseek-v4-flash-0731', $embed_model = 'nvidia/llama-nemotron-embed-vl-1b-v2:free' ) {
         $this->api_key = trim($api_key);
         $this->chat_model = trim($chat_model);
         $this->embed_model = trim($embed_model);
@@ -111,7 +111,8 @@ class OpenRouter_API_Client {
             'model'       => $this->chat_model,
             'messages'    => $messages,
             'temperature' => 0.1,
-            'max_tokens'  => 150
+            'max_tokens'  => 150,
+            'reasoning'  => array( 'enabled' => false ), // reasoning models (DeepSeek V4) spend max_tokens on thinking and return empty content
         );
 
         $response = wp_remote_post( $endpoint, array(
@@ -178,7 +179,8 @@ class OpenRouter_API_Client {
             'model' => $this->chat_model,
             'messages' => $messages,
             'temperature' => 0.4,
-            'max_tokens' => 500
+            'max_tokens' => 500,
+            'reasoning'  => array( 'enabled' => false ), // reasoning models (DeepSeek V4) spend max_tokens on thinking and return empty content
         );
 
         $response = wp_remote_post( $endpoint, array(
@@ -248,7 +250,8 @@ class OpenRouter_API_Client {
             'messages'    => $messages,
             'stream'      => true,
             'temperature' => 0.4,
-            'max_tokens'  => 500
+            'max_tokens'  => 500,
+            'reasoning'  => array( 'enabled' => false ), // reasoning models (DeepSeek V4) spend max_tokens on thinking and return empty content
         );
 
         $ch = curl_init( $endpoint );
