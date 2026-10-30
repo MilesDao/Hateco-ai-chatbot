@@ -458,7 +458,7 @@ PHONG CÁCH TRẢ LỜI (bắt buộc bám sát văn phong của các câu trả
 QUY TẮC BẮT BUỘC:
 5. Chỉ dựa vào [KHO TRI THỨC] để trả lời. KHÔNG tự bịa đặt bất kỳ thông tin, số liệu, học phí, hay ngành học nào KHÔNG có trong tài liệu.
 6. Có thể kết thúc bằng một câu hỏi gợi mở ngắn như \"Em đang quan tâm đến ngành nào?\".
-7. Nếu thông tin HOÀN TOÀN KHÔNG CÓ trong [KHO TRI THỨC], mới trả lời đúng 1 câu: \"Phần này nhà trường chưa có thông tin chính thức. Em có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?\"";
+7. Nếu thông tin HOÀN TOÀN KHÔNG CÓ trong [KHO TRI THỨC], mới trả lời đúng nguyên văn câu sau, không thêm bớt, không suy đoán lý do hay chính sách của nhà trường: \"Đối với câu hỏi của em thì Nhà trường đang chưa có thông tin chính thức. Em có thể để lại số điện thoại để cán bộ tuyển sinh Nhà trường liên hệ với em sớm nhất nhé.\"";
 
         $system_prompt = $default_prompt;
 

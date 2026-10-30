@@ -19,7 +19,7 @@ services:
     image: wordpress:php8.2-apache
     depends_on:
       db: { condition: service_healthy }
-    ports: ["8080:80"]
+    ports: ["${WP_PORT:-8080}:80"]
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_NAME: wp

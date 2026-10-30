@@ -1,0 +1,103 @@
+﻿question,facts,retrieval,fact_ranks,answer_ok,answer
+Học phí ngành Tiếng Anh một tín chỉ là bao nhiêu?,480.000,OK,[1],True,"Học phí ngành Tiếng Anh tại trường là 480.000 đồng/tín chỉ em nhé. Học phí mỗi kỳ sẽ được tính bằng số tín chỉ em đăng ký nhân với mức học phí này.
+
+Em đang quan tâm đến ngành Tiếng Anh của trường mình à?"
+Ngành Marketing học phí bao nhiêu một tín chỉ?,420.000,OK,[1],True,Ngành Marketing học phí là 420.000 đồng/mỗi tín chi. Em đang quan tâm đến ngành này để nhà trường tư vấn kĩ hơn cho em nhé?
+Kế toán doanh nghiệp học phí tín chỉ thế nào?,390.000,OK,[1],True,"Kế toán doanh nghiệp có mức học phí 390.000 đồng/tín chỉ theo quy định áp dụng từ khóa 15 trở đi. Học phí mỗi kỳ được tính bằng số tín chỉ đăng ký nhân với mức trên, ví dụ đăng ký 15 tín chỉ thì học phí là 5.850.000 đồng.
+
+Em đang quan tâm đến ngành Kế toán doanh nghiệp và muốn được tư vấn kỹ hơn về chương trình học không?"
+Học phí ngành Công nghệ thông tin tính ra sao?,450.000,OK,[2],True,"Ngành Công nghệ thông tin (Ứng dụng phần mềm) của nhà trường có mức học phí là 450.000 đồng/tín chỉ.
+Học phí mỗi học kỳ sẽ bằng số tín chỉ em đăng ký nhân với mức trên. Ví dụ, nếu em đăng ký 15 tín chỉ thì học phí là 15 × 450.000 = 6.750.000 đồng.
+Em đang quan tâm đến ngành Công nghệ thông tin của trường mình à?"
+Cách tính học phí như thế nào?,số tín chỉ|mức học phí,OK,"[1, 1]",True,"Học phí của nhà trường được tính theo công thức: Học phí = Số tín chỉ đăng ký × Mức học phí mỗi tín chỉ. Tổng học phí mỗi kỳ sẽ phụ thuộc vào số tín chỉ em đăng ký, còn tổng học phí toàn khóa phụ thuộc vào tổng số tín chỉ của chương trình. Tài liệu hiện tại chưa nêu tổng số tín chỉ từng kỳ hoặc toàn khóa, nên em nên liên hệ hotline 085 3292255 hoặc 0867 848 868 để xác nhận mức thu đang áp dụng và số tiền cần đóng nhé. 
+
+Em đang quan tâm đến ngành nào để nhà trường tư vấn mức học phí cụ thể hơn không?"
+Những ngành nào được giảm 70% học phí?,Thú y|chế biến món ăn|ô tô|cây ăn quả|cơ khí,OK,"[1, 1, 1, 1, 1]",True,"Năm 2026, các ngành sau thuộc diện được giảm 70% học phí:
+- Chăn nuôi – Thú y
+- Kỹ thuật chế biến món ăn
+- Công nghệ ô tô
+- Trồng cây ăn quả
+- Lắp đặt thiết bị cơ khí
+
+Em đang quan tâm đến ngành nào trong số này không?"
+Học ngành Quản trị khách sạn có được giảm 70% học phí không?,không,OK,[1],True,"Ngành Quản trị khách sạn không thuộc diện được giảm 70% học phí em nhé. Các ngành được áp dụng chính sách giảm 70% học phí là:
+- Chăn nuôi – Thú y
+- Kỹ thuật chế biến món ăn
+- Công nghệ ô tô
+- Trồng cây ăn quả
+- Lắp đặt thiết bị cơ khí
+
+Em đang quan tâm đến ngành nào? Nhà trường có thể tư vấn kĩ hơn cho em nhé."
+Trường có bao nhiêu ngành đào tạo?,14,OK,[1],True,"Trường đang đào tạo 14 ngành, bao gồm các nhóm:
+- Nhóm ngoại ngữ: Tiếng Anh, Tiếng Hàn Quốc, Tiếng Nhật
+- Nhóm kinh tế, kinh doanh: Marketing, Thương mại điện tử, Kế toán doanh nghiệp, Quản trị doanh nghiệp vừa và nhỏ
+- Nhóm công nghệ, kỹ thuật: Công nghệ ô tô, Công nghệ thông tin (Ứng dụng phần mềm), Lắp đặt thiết bị cơ khí
+- Nhóm nông nghiệp: Trồng cây ăn quả, Chăn nuôi – Thú y
+- Nhóm khách sạn, nhà hàng: Quản trị khách sạn, Kỹ thuật chế biến món ăn
+
+Em đang quan tâm đến ngành nào?"
+Trường có đào tạo ngành Tiếng Nhật không?,Tiếng Nhật,OK,[1],True,"Nhà trường có đào tạo ngành Tiếng Nhật ở cả hệ cao đẳng và hệ đào tạo từ xa em nhé. Mức học phí của ngành này là 480.000 đồng/tín chỉ.
+
+Em đang quan tâm đến ngành Tiếng Nhật để làm gì? Nhà trường có thể tư vấn thêm cho em."
+Học cao đẳng ở trường mất bao lâu?,"2,5|3 năm",OK,"[1, 1]",True,"Hệ cao đẳng tại trường có thời gian đào tạo tham khảo là 2,5–3 năm, tùy vào ngành và chương trình cụ thể. Em đang quan tâm đến ngành nào để nhà trường tư vấn kỹ hơn nhé?"
+Hệ trung cấp học mấy năm?,1|2 năm,OK,"[1, 1]",True,"Hệ trung cấp của trường có thời gian đào tạo tham khảo là 1–2 năm, tùy thuộc vào ngành học, trình độ đầu vào và chương trình đào tạo cụ thể. Em đang quan tâm đến ngành nào để được tư vấn chi tiết hơn nhé."
+Tốt nghiệp lớp 9 có học được không?,9+|THCS,OK,"[1, 1]",True,"Hoàn toàn được em nhé. Học sinh tốt nghiệp THCS có thể đăng ký học hệ trung học nghề (9+) tại trường, kết hợp học văn hóa THPT và đào tạo nghề."
+Điều kiện đăng ký hệ cao đẳng là gì?,THPT,OK,[1],True,"Để đăng ký hệ cao đẳng tại trường, em cần đáp ứng các điều kiện sau:
+- Người đã tốt nghiệp THPT hoặc có trình độ tương đương theo quy định.
+- Người đã tốt nghiệp trung cấp có thể đăng ký nếu đáp ứng yêu cầu về kiến thức văn hóa THPT theo quy định.
+- Thí sinh cần có sức khỏe phù hợp với ngành học và đáp ứng điều kiện tuyển sinh của nhà trường.
+
+Em đã tốt nghiệp THPT chưa và đang quan tâm đến ngành nào? Nếu cần hỗ trợ thêm, em có thể để lại số điện thoại để thầy cô tư vấn tuyển sinh gọi điện hướng dẫn kỹ hơn nhé."
+Trường xét tuyển theo những phương thức nào?,học bạ|điểm thi|xét tuyển thẳng,OK,"[1, 1, 1]",True,"Nhà trường hiện sử dụng các phương thức xét tuyển sau:
+- Xét điểm thi tốt nghiệp THPT năm 2026 theo tổ hợp môn xét tuyển của ngành đăng ký.
+- Xét học bạ THPT theo quy định tuyển sinh.
+- Xét tuyển thẳng đối với thí sinh đáp ứng điều kiện theo quy định.
+- Đối với hệ trung học nghề (9+), xét tuyển dựa trên điều kiện tốt nghiệp THCS.
+
+Em đang quan tâm đến ngành nào và đã có bằng cấp gì chưa? Nhà trường có thể tư vấn rõ hơn về phương thức phù hợp với em."
+Hồ sơ đăng ký hệ cao đẳng cần những giấy tờ gì?,học bạ|CCCD|giấy khai sinh|ảnh 4,OK,"[1, 1, 1, 1]",True,"Hồ sơ đăng ký xét tuyển hệ cao đẳng của nhà trường gồm các giấy tờ sau:
+- Phiếu đăng ký tuyển sinh theo mẫu của nhà trường.
+- Học bạ THPT hoặc giấy tờ tương đương.
+- Bằng tốt nghiệp THPT hoặc giấy chứng nhận tốt nghiệp.
+- CCCD hoặc thông tin CCCD trên VNeID.
+- Giấy khai sinh.
+- Hai ảnh 4×6.
+- Hai phong bì có dán tem, ghi địa chỉ và số điện thoại.
+- Giấy chứng nhận ưu tiên nếu có.
+
+Bản sao giấy tờ cần được công chứng theo yêu cầu của nhà trường. Em đang quan tâm đến ngành nào để nhà trường tư vấn thêm nhé?"
+Hồ sơ hệ sơ cấp gồm những gì?,khám sức khỏe,OK,[2],True,"Hồ sơ hệ sơ cấp gồm các giấy tờ sau:
+- Phiếu đăng ký tuyển sinh.
+- CCCD hoặc thông tin CCCD trên VNeID.
+- Giấy khám sức khỏe còn thời hạn.
+- Hai ảnh 4×6.
+- Hai phong bì có dán tem và ghi địa chỉ liên hệ.
+
+Em đang quan tâm đến nghề nào để nhà trường tư vấn kỹ hơn nhé?"
+Đăng ký xét tuyển bằng cách nào?,trực tuyến|hotline,OK,"[2, 4]",False,"Để thuận tiện hơn, nhà trường đang xét tuyển theo hình thức online. Hồ sơ gồm có:
+1. Ảnh chụp CCCD 2 mặt;
+2. Ảnh chụp học bạ trung học phổ thông;
+3. Số điện thoại;
+4. Ngành đăng ký học;
+5. Địa chỉ cụ thể nơi em đang ở để nhà trường gửi giấy báo nhập học.
+
+Hồ sơ thì em sẽ nộp qua Zalo và nhà trường sẽ nhờ tư vấn viên liên hệ hướng dẫn em từng bước. Nếu em đang rảnh thì em có thể để lại số điện thoại nhà trường sẽ liên hệ và tư vấn hỗ trợ cho em nhé."
+Nộp hồ sơ trực tiếp ở đâu?,202 Hồ Tùng Mậu,OK,[1],True,"Em có thể nộp hồ sơ trực tiếp tại Phòng Truyền thông – Tuyển sinh của nhà trường, địa chỉ: 202 Hồ Tùng Mậu, phường Phú Diễn, thành phố Hà Nội. Ngoài ra, em cũng có thể gửi hồ sơ qua bưu điện đến địa chỉ trên hoặc đăng ký trực tuyến tại website https://hateco.edu.vn. Em đang quan tâm đến ngành học nào để nhà trường hỗ trợ thêm thông tin nhé?"
+Văn phòng tuyển sinh của trường ở đâu?,Lê Đức Thọ,OK,[3],True,"Văn phòng tuyển sinh của trường ở Số 2 Lê Đức Thọ, phường Từ Liêm, thành phố Hà Nội. Em có thể đến trực tiếp để được cán bộ tuyển sinh hỗ trợ tư vấn và hướng dẫn làm hồ sơ nhé."
+Trụ sở chính của trường ở đâu?,202 Hồ Tùng Mậu|Phú Diễn,OK,"[2, 1]",False,"Trụ sở chính của Trường Cao đẳng Kinh tế Công nghệ Hà Nội (HATECO) ở số 202 đường Hồ Tùng Mậu, phường Phú Diễn, thành phố Hà Nội. Ngoài ra, trường còn có văn phòng tuyển sinh tại số 2 Lê Đức Thọ, phường Từ Liêm, thành phố Hà Nội. Em đang quan tâm đến ngành học nào để nhà trường tư vấn thêm nhé?"
+Số hotline tuyển sinh của trường là gì?,085 3292255|0867 848 868,OK,"[1, 1]",True,"Hotline tuyển sinh của trường là 085 3292255 hoặc 0867 848 868. Em có thể gọi để được hỗ trợ tư vấn ngành học, hồ sơ, học phí và thủ tục nhập học nhé."
+Email của trường là gì?,vp@hateco.edu.vn,OK,[2],True,Email của trường là vp@hateco.edu.vn. Em có thể liên hệ qua email này hoặc gọi hotline 085 3292255 hoặc 0867 848 868 nếu cần hỗ trợ thêm em nhé.
+Website của trường là gì?,hateco.edu.vn,OK,[1],True,"Website của Trường Cao đẳng Kinh tế Công nghệ Hà Nội (HATECO) là: https://hateco.edu.vn
+
+Trên website, em có thể tham khảo thông tin tuyển sinh và đăng ký xét tuyển trực tuyến. Em đang quan tâm đến ngành học nào?"
+Đợt 1 nhập học khi nào?,16/06|30/07,OK,"[1, 1]",True,Đợt 1 nhập học năm 2026 của nhà trường diễn ra từ 16/06 đến 30/07/2026; và bắt đầu học từ ngày 03/08/2026. Em nhớ theo dõi thông báo của trường để xác nhận lịch thực tế của ngành và chương trình đăng ký nhé. Em đang quan tâm đến ngành nào?
+Đợt 3 nhập học và bắt đầu học khi nào?,19/10|01/12,OK,"[1, 1]",True,Đợt 3 nhập học từ 19/10 đến 20/11/2026 và bắt đầu học ngày 01/12/2026. Em cần theo dõi thông báo của trường để xác nhận lịch thực tế của ngành và chương trình đăng ký nhé. Em đang quan tâm đến ngành nào?
+Đến muộn nhập học quá bao nhiêu ngày thì bị từ chối?,15 ngày,OK,[1],True,"Thí sinh đến nhập học muộn quá 15 ngày có thể bị từ chối tiếp nhận, trừ trường hợp bất khả kháng có giấy xác nhận hợp lệ sẽ được nhà trường xem xét theo quy định. Em cần chú ý thời gian nhập học ghi trong giấy triệu tập để tránh bị ảnh hưởng nhé."
+Thời hạn nộp đơn phúc tra kết quả xét tuyển?,15 ngày,OK,[1],True,Thời hạn nộp đơn phúc tra kết quả xét tuyển là trong vòng 15 ngày kể từ ngày công bố kết quả. Nhà trường sẽ trả lời chậm nhất 10 ngày kể từ ngày nhận đơn. Em có thắc mắc gì thêm về quy trình tuyển sinh không?
+Trường có học bổng cho sinh viên nhập học sớm không?,nhập học sớm,OK,[2],True,"Nhà trường có chương trình học bổng dành cho sinh viên đăng ký nhập học sớm, cùng với các nhóm sinh viên có thành tích học tập tốt, hoàn cảnh khó khăn hoặc năng lực nổi bật. Ngoài ra, nhà trường còn có chương trình hỗ trợ học phí thông qua hợp tác với doanh nghiệp, mức hỗ trợ có thể lên đến 100% đối với trường hợp đủ điều kiện.
+
+Em đang quan tâm đến ngành học nào để nhà trường tư vấn kỹ hơn nhé?"
+Hỗ trợ học phí từ doanh nghiệp tối đa bao nhiêu?,100%,OK,[3],True,"Nhà trường có chương trình hỗ trợ học phí thông qua hợp tác với doanh nghiệp, với mức hỗ trợ có thể lên đến 100% đối với trường hợp đủ điều kiện.
+
+Em đang quan tâm đến ngành học nào để nhà trường tư vấn kỹ hơn về chính sách hỗ trợ này nhé?"
+Trường có tuyển sinh toàn quốc không?,toàn quốc,OK,[2],True,Trường tuyển sinh trong phạm vi toàn quốc theo hình thức xét tuyển em nhé. Em đang quan tâm đến ngành nào của trường?
