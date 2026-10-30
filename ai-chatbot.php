@@ -3,7 +3,7 @@
  * Plugin Name: Hateco AI Chatbot
  * Plugin URI: https://github.com/google-deepmind/ai-chatbot
  * Description: A self-contained Hateco AI Chatbot with Retrieval-Augmented Generation (RAG) powered by the Gemini API. Index local files in WordPress MySQL and query them in real-time using a beautiful glassmorphic floating widget.
- * Version: 2.4.0
+ * Version: 2.5.0
  * Author: Dao Trung
  * Text Domain: ai-chatbot
  * Requires at least: 5.8
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 // Define Constants
 define('AI_CHATBOT_PATH', plugin_dir_path(__FILE__));
 define('AI_CHATBOT_URL', plugin_dir_url(__FILE__));
-define('AI_CHATBOT_VERSION', '2.4.0');
+define('AI_CHATBOT_VERSION', '2.5.0');
 
 /**
  * Custom activation routine to create database tables for documents and chunks.
@@ -134,6 +134,7 @@ function ai_chatbot_activate()
         id bigint(20) NOT NULL AUTO_INCREMENT,
         question text NOT NULL,
         answer longtext NOT NULL,
+        embedding longtext,
         created_at datetime DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY  (id)
     ) $charset_collate;";
@@ -360,9 +361,10 @@ class AI_Chatbot_Chatbot
         // ==========================================
         if (!$is_lead_capture) {
             $faq = AI_Chatbot_FAQ::find($message);
+            $faq_score = round(AI_Chatbot_FAQ::$last_score, 3);
             if ($faq) {
                 if (isset($_POST['eval_mode']) && '1' === $_POST['eval_mode']) {
-                    wp_send_json_success(array('answer' => $faq['answer'], 'contexts' => array($faq['question']), 'lead' => $lead, 'faq' => true));
+                    wp_send_json_success(array('answer' => $faq['answer'], 'contexts' => array($faq['question']), 'lead' => $lead, 'faq' => true, 'faq_score' => $faq_score));
                 }
                 $this->send_text_as_stream($faq['answer']);
             }
@@ -371,7 +373,11 @@ class AI_Chatbot_Chatbot
         // ==========================================
         // PHASE 10: Cache Check
         // ==========================================
-        $cache_key = 'ai_chat_' . md5(strtolower(trim($message)) . serialize($history) . ($lead ? 'lead' : ''));
+        // Admin "Hành vi AI" options are part of the key so editing them doesn't serve stale cached answers.
+        $style = get_option('ai_chatbot_response_style', '');
+        $samples = get_option('ai_chatbot_sample_replies', '');
+        $biz_info = get_option('ai_chatbot_business_info', '');
+        $cache_key = 'ai_chat_' . md5(strtolower(trim($message)) . serialize($history) . ($lead ? 'lead' : '') . $style . $samples . $biz_info);
         $cached_response = get_transient($cache_key);
         if (!$is_lead_capture && $cached_response !== false) {
             $this->send_text_as_stream($cached_response);
@@ -436,7 +442,7 @@ class AI_Chatbot_Chatbot
             }
         }
 
-        // Custom system prompt/persona from settings
+        // Hardcoded base system prompt (admin "Hành vi AI" tab appends to it below)
         $default_prompt = "Bạn là Trợ lý AI tư vấn tuyển sinh chính thức của trường Cao đẳng Kinh tế Công nghệ Hà Nội (Hateco). Hỗ trợ giải đáp thắc mắc, tư vấn chọn ngành, hướng dẫn thủ tục xét tuyển cho học sinh, phụ huynh quan tâm đến trường HATECO.
 
 [KHO TRI THỨC]
@@ -454,7 +460,6 @@ QUY TẮC BẮT BUỘC:
 6. Có thể kết thúc bằng một câu hỏi gợi mở ngắn như \"Em đang quan tâm đến ngành nào?\".
 7. Nếu thông tin HOÀN TOÀN KHÔNG CÓ trong [KHO TRI THỨC], mới trả lời đúng 1 câu: \"Phần này nhà trường chưa có thông tin chính thức. Em có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?\"";
 
-        // Force the new prompt by bypassing the database option which holds the old one
         $system_prompt = $default_prompt;
 
         // Inject context into the prompt
@@ -462,6 +467,16 @@ QUY TẮC BẮT BUỘC:
             $system_prompt = str_replace('{context}', $chunks_text, $system_prompt);
         } else {
             $system_prompt .= "\n\n[KHO TRI THỨC]\n" . $chunks_text . "\n[/KHO TRI THỨC]";
+        }
+
+        if ($biz_info !== '') {
+            $system_prompt .= "\n\n[THÔNG TIN DOANH NGHIỆP]\n" . $biz_info . "\n[/THÔNG TIN DOANH NGHIỆP]\nĐây cũng là nguồn thông tin chính thức, dùng được cùng [KHO TRI THỨC].";
+        }
+        if ($style !== '') {
+            $system_prompt .= "\n\n[MÔ TẢ PHẢN HỒI]\n" . $style . "\n[/MÔ TẢ PHẢN HỒI]\nNếu mâu thuẫn với PHONG CÁCH TRẢ LỜI ở trên thì làm theo [MÔ TẢ PHẢN HỒI]; vẫn không được bịa thông tin.";
+        }
+        if ($samples !== '') {
+            $system_prompt .= "\n\n[PHẢN HỒI MẪU]\n" . $samples . "\n[/PHẢN HỒI MẪU]\nChỉ bắt chước văn phong và cách trình bày của các phản hồi mẫu; dữ kiện phải lấy từ [KHO TRI THỨC] hoặc [THÔNG TIN DOANH NGHIỆP].";
         }
 
         $context_text = $system_prompt . AI_Chatbot_Lead_Flow::flow_rules($lead);
@@ -489,7 +504,8 @@ QUY TẮC BẮT BUỘC:
             wp_send_json_success(array(
                 'answer' => is_wp_error($answer) ? $answer->get_error_message() : $answer,
                 'contexts' => $raw_contexts,
-                'lead' => $lead
+                'lead' => $lead,
+                'faq_score' => isset($faq_score) ? $faq_score : null
             ));
             exit;
         }

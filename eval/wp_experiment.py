@@ -103,7 +103,7 @@ def report(results):
 
     def cell(r):
         txt, color = label[r["verdict"]]
-        return (f'<span class="tag">{r["path"]}</span> <b style="color:{color}">{txt}</b>'
+        return (f'<span class="tag">{r["path"]} · cos {r.get("faq_score")}</span> <b style="color:{color}">{txt}</b>'
                 f'<div class="ans">{html.escape(r["answer"])}</div><div class="why">{html.escape(r["reason"])}</div>')
 
     def rate(method, pred=lambda t: True):
@@ -182,18 +182,18 @@ def ask(question, nonce, n):
     if not r.get("success"):
         raise RuntimeError(f"chat lỗi: {r}")
     d = r["data"]
-    return d["answer"], ("FAQ" if d.get("faq") else "RAG")
+    return d["answer"], ("FAQ" if d.get("faq") else "RAG"), d.get("faq_score")
 
 
 def run_all(tests, nonce, key, tag):
     out = []
     for n, t in enumerate(tests, 1):
-        ans, path = ask(t["q"], nonce, n)
+        ans, path, score = ask(t["q"], nonce, n)
         try:
             verdict, reason = judge(t["q"], t["gt"], ans, key)
         except Exception as e:  # một lần chấm lỗi không được làm mất cả lượt chạy
             verdict, reason = "sai", f"(lỗi chấm: {e})"
-        out.append({"path": path, "answer": ans, "verdict": verdict, "reason": reason})
+        out.append({"path": path, "faq_score": score, "answer": ans, "verdict": verdict, "reason": reason})
         print(f"[{tag} {n}/{len(tests)}] {path} {verdict:8} {t['q']}", flush=True)
     return out
 

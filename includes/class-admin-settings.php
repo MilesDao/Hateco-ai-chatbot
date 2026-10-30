@@ -63,13 +63,17 @@ class AI_Chatbot_Admin_Settings
         register_setting('ai_chatbot_options', 'ai_chatbot_require_lead_form');
         register_setting('ai_chatbot_options', 'ai_chatbot_primary_color');
         register_setting('ai_chatbot_options', 'ai_chatbot_welcome_message');
-        register_setting('ai_chatbot_options', 'ai_chatbot_system_prompt');
         register_setting('ai_chatbot_options', 'ai_chatbot_chunk_size');
         register_setting('ai_chatbot_options', 'ai_chatbot_chunk_overlap');
         register_setting('ai_chatbot_options', 'ai_chatbot_top_k');
         register_setting('ai_chatbot_options', 'ai_chatbot_pinecone_api_key');
         register_setting('ai_chatbot_options', 'ai_chatbot_pinecone_host');
         register_setting('ai_chatbot_options', 'ai_chatbot_google_sheets_webhook');
+
+        // Separate group: options.php nulls every option of the group it saves, so the AI tab must not share the settings tab's group.
+        foreach (array('ai_chatbot_response_style', 'ai_chatbot_sample_replies', 'ai_chatbot_business_info') as $opt) {
+            register_setting('ai_chatbot_ai_options', $opt, array('sanitize_callback' => 'sanitize_textarea_field'));
+        }
     }
 
     /**
@@ -121,20 +125,6 @@ class AI_Chatbot_Admin_Settings
         $primary_color = get_option('ai_chatbot_primary_color', '#0ea5e9');
         $welcome_msg = get_option('ai_chatbot_welcome_message', 'Trường Cao đẳng Kinh tế Công nghệ Hà Nội xin chào! Chúng tôi có thể giúp gì cho bạn hôm nay?');
 
-        $default_prompt = "Bạn là Trợ lý AI tư vấn tuyển sinh chính thức của trường Cao đẳng Kinh tế Công nghệ Hà Nội (Hateco) Hỗ trợ giải đáp thắc mắc, tư vấn chọn ngành, hướng dẫn thủ tục xét tuyển cho học sinh, phụ huynh quan tâm đến trường HATECO. Xưng \"mình\", gọi người dùng là \"bạn\".
-
-[KHO TRI THỨC]
-{context}
-[/KHO TRI THỨC]
-
-QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
-1. Dựa vào [KHO TRI THỨC] để trả lời một cách thân thiện, nhiệt tình.
-2. Trình bày các danh sách (ví dụ: danh sách ngành học) bằng dấu cộng (+) rõ ràng ở đầu mỗi dòng.
-3. Có thể kết thúc câu trả lời bằng những câu hỏi gợi mở thân thiện như \"Bạn đang quan tâm đến ngành nào?\" hoặc \"Để mình tư vấn kỹ hơn cho bạn nhé.\"
-4. KHÔNG tự bịa đặt bất kỳ thông tin, số liệu, học phí, hay ngành học nào KHÔNG có trong tài liệu.
-5. Nếu thông tin HOÀN TOÀN KHÔNG CÓ trong [KHO TRI THỨC], mới trả lời đúng 1 câu: \"Dạ, phần này bên mình chưa có thông tin chính thức. Bạn có muốn để lại tên và số điện thoại để phòng đào tạo liên hệ hỗ trợ không ạ?\"";
-
-        $system_prompt = get_option('ai_chatbot_system_prompt', $default_prompt);
         $chunk_size = get_option('ai_chatbot_chunk_size', '1000');
         $chunk_overlap = get_option('ai_chatbot_chunk_overlap', '200');
         $top_k = get_option('ai_chatbot_top_k', '5');
@@ -416,6 +406,8 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
                 <a href="?page=ai-chatbot&tab=settings"
                     class="ai_chatbot-tab-link <?php echo 'settings' === $active_tab ? 'active' : ''; ?>">Cấu hình Chatbot &
                     Giao diện</a>
+                <a href="?page=ai-chatbot&tab=ai"
+                    class="ai_chatbot-tab-link <?php echo 'ai' === $active_tab ? 'active' : ''; ?>">Hành vi AI</a>
                 <a href="?page=ai-chatbot&tab=kb"
                     class="ai_chatbot-tab-link <?php echo 'kb' === $active_tab ? 'active' : ''; ?>">Tài liệu</a>
                 <a href="?page=ai-chatbot&tab=faq"
@@ -533,14 +525,6 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
                             <p class="description">Lời nhắn đầu tiên của AI gửi tới khách hàng khi mở khung chat.</p>
                         </div>
 
-                        <div class="ai_chatbot-form-group">
-                            <label for="ai_chatbot_system_prompt">Chỉ dẫn hành vi Bot (Persona / System Instructions)</label>
-                            <textarea id="ai_chatbot_system_prompt" name="ai_chatbot_system_prompt"
-                                rows="4"><?php echo esc_textarea($system_prompt); ?></textarea>
-                            <p class="description">Thiết lập giọng điệu, tính cách hoặc các ràng buộc cho chatbot AI (ví dụ: cấm nói
-                                giá sản phẩm khác, luôn hướng dẫn liên hệ hotline...).</p>
-                        </div>
-
                         <h3
                             style="margin-top: 30px; font-size: 18px; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; max-width: 600px;">
                             Cấu hình RAG & Chunk nâng cao</h3>
@@ -587,6 +571,35 @@ QUY TẮC BẮT BUỘC (TUÂN THỦ TUYỆT ĐỐI ĐỂ TRÁNH THÔNG TIN SAI):
                             </label>
                             <p class="description">Dùng AI chuyên biệt để xếp hạng lại tài liệu. <em>Tắt đi sẽ giúp giảm ~1.5 giây
                                     độ trễ.</em></p>
+                        </div>
+
+                        <?php submit_button('Lưu cấu hình', 'primary', 'submit', true, array('class' => 'ai_chatbot-btn-primary')); ?>
+                    </form>
+                </div>
+            <?php elseif ('ai' === $active_tab): ?>
+                <div class="ai_chatbot-card">
+                    <form method="post" action="options.php">
+                        <?php settings_fields('ai_chatbot_ai_options'); ?>
+
+                        <div class="ai_chatbot-form-group">
+                            <label for="ai_chatbot_response_style">Mô tả phản hồi của AI</label>
+                            <textarea id="ai_chatbot_response_style" name="ai_chatbot_response_style" rows="5"
+                                placeholder="VD: Trả lời ngắn gọn, thân thiện như một tư vấn viên tuyển sinh. Xưng &quot;nhà trường&quot;, gọi người dùng là &quot;em&quot;. Không dùng icon."><?php echo esc_textarea(get_option('ai_chatbot_response_style', '')); ?></textarea>
+                            <p class="description">Mô tả giọng điệu, cách xưng hô, độ dài và định dạng câu trả lời. Nội dung này được ưu tiên hơn phong cách mặc định khi mâu thuẫn.</p>
+                        </div>
+
+                        <div class="ai_chatbot-form-group">
+                            <label for="ai_chatbot_sample_replies">Phản hồi mẫu</label>
+                            <textarea id="ai_chatbot_sample_replies" name="ai_chatbot_sample_replies" rows="10"
+                                placeholder="Hỏi: Trường có xét học bạ không?&#10;Đáp: Có em nhé. Trường xét tuyển bằng học bạ THPT.&#10;&#10;Hỏi: Học phí bao nhiêu?&#10;Đáp: ..."><?php echo esc_textarea(get_option('ai_chatbot_sample_replies', '')); ?></textarea>
+                            <p class="description">Các cặp câu hỏi - câu trả lời mẫu để AI học cách trả lời. Mỗi cặp gồm dòng "Hỏi: ..." và "Đáp: ...", các cặp cách nhau một dòng trống. AI chỉ bắt chước văn phong, không coi đây là nguồn dữ kiện (dữ kiện lấy từ Tài liệu / FAQ).</p>
+                        </div>
+
+                        <div class="ai_chatbot-form-group">
+                            <label for="ai_chatbot_business_info">Thông tin cơ bản về doanh nghiệp</label>
+                            <textarea id="ai_chatbot_business_info" name="ai_chatbot_business_info" rows="8"
+                                placeholder="Tên trường, địa chỉ, hotline, email, website, giờ làm việc, giới thiệu ngắn..."><?php echo esc_textarea(get_option('ai_chatbot_business_info', '')); ?></textarea>
+                            <p class="description">Thông tin nền luôn được gửi kèm mọi câu trả lời (không cần truy xuất từ Tài liệu). Chỉ nhập thông tin ngắn gọn, chính xác.</p>
                         </div>
 
                         <?php submit_button('Lưu cấu hình', 'primary', 'submit', true, array('class' => 'ai_chatbot-btn-primary')); ?>
